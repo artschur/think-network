@@ -12,14 +12,17 @@ If you have **NVM (Node Version Manager)** installed, run:
 nvm install 20
 nvm use 20
 ```
+
 To set this version as default:
 ```bash
 nvm alias default 20
 ```
+
 If you don’t have NVM, install it with:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 ```
+
 Then restart your terminal.
 
 #### Update Node.js using a Package Manager
@@ -28,10 +31,12 @@ Then restart your terminal.
   ```bash
   sudo apt update && sudo apt install -y nodejs npm
   ```
+
 - **macOS (Homebrew)**:
   ```bash
   brew update && brew install node
   ```
+
 - **Windows**: Download the latest version from [Node.js official website](https://nodejs.org/)
 
 After installation, verify the version:
@@ -43,6 +48,19 @@ Ensure it is **18.18.0 or higher**.
 #### Install Bun (Optional)
 If you want to use **Bun** as your package manager and runtime, install it following the official instructions:
 [https://bun.sh/docs/installation](https://bun.sh/docs/installation)
+
+### VS Code Configuration
+
+To ensure consistent formatting, add the following lines to your **settings.json** file in VS Code:
+
+```json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
+}
+```
+
+To access this file, press `Ctrl + Shift + P`, search for **Settings**, and open the JSON settings editor.
 
 ### Run the Development Server
 
