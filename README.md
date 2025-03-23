@@ -1,3 +1,25 @@
+# Projeto Web - Rede Social
+
+A proposta do nosso projeto é oferecer uma experiência de rede social simples, mas com recursos que promovem interações significativas e a construção de uma comunidade. O acesso só é permitido a usuários autenticados, garantindo um ambiente seguro e controlado para os nossos usuários.
+
+Principais Funcionalidades:
+
+ • Autenticação Segura: Apenas usuários autenticados poderão acessar a plataforma, garantindo um espaço privado e protegido para interação.
+
+ • Criação de Posts com Imagens: Os usuários podem criar posts de texto,mas também incluindo imagens, para compartilhar momentos, pensamentos ou interesses com seus seguidores.
+
+ • Interação com Curtidas e Comentários: Os usuários podem curtir e comentar nos posts de outros, incentivando a troca de ideias e criando um grande engajamento.
+
+ • Sistema de Seguimento: É possível seguir outros usuários para acompanhar seus posts e interagir com o conteúdo de seu interesse.
+
+ • Feed Personalizado: O feed de cada usuário será atualizado com os posts recentes das pessoas que ele segue, criando uma experiência de uso personalizada e alinhada com os seus interesses.
+
+
+
+
+# Instruções para rodar o projeto
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
