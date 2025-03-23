@@ -3,16 +3,16 @@ import { boolean, index, integer, pgTable, varchar } from "drizzle-orm/pg-core";
 export const postsTable = pgTable("posts", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     userId: varchar({ length: 255 }).notNull(),
-    postId: integer(),
+    postReference: integer(),
     content: integer().notNull(),
     isComment: boolean().notNull(),
     likeCount: integer().notNull().default(0),
-    createAt: integer().notNull().default(Date.now()),
+    createdAt: integer().notNull().default(Date.now()),
 
 }, (table) => {
     return {
         userIdPostIdIdx: index("userIdIndex").on(table.userId),
-        postIdIdx: index("postIdIndex").on(table.postId),
+        postIdIdx: index("postIdIndex").on(table.postReference),
     };
 });
 
