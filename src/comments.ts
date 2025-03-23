@@ -2,7 +2,7 @@
 
 import { db } from './db';
 import { postsTable } from './db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 type CommentNode = {
   comment: number;
@@ -13,7 +13,7 @@ export async function getNestedComments(postId: number): Promise<CommentNode[]> 
   const comments = await db
     .select({ id: postsTable.id, postReference: postsTable.postReference })
     .from(postsTable)
-    .where(eq(postsTable.postReference, postId));
+    .where(and(eq(postsTable.postReference, postId), eq(postsTable.isComment, true)));
 
   const buildTree = (parentId: number): CommentNode[] => {
     return comments
