@@ -2,7 +2,7 @@
 
 A proposta do nosso projeto é oferecer uma experiência de rede social simples, mas com recursos que promovem interações significativas e a construção de uma comunidade. O acesso só é permitido a usuários autenticados, garantindo um ambiente seguro e controlado para os nossos usuários.
 
-Principais Funcionalidades:
+## Principais Funcionalidades:
 
  • Autenticação Segura: Apenas usuários autenticados poderão acessar a plataforma, garantindo um espaço privado e protegido para interação.
 
@@ -13,6 +13,14 @@ Principais Funcionalidades:
  • Sistema de Seguimento: É possível seguir outros usuários para acompanhar seus posts e interagir com o conteúdo de seu interesse.
 
  • Feed Personalizado: O feed de cada usuário será atualizado com os posts recentes das pessoas que ele segue, criando uma experiência de uso personalizada e alinhada com os seus interesses.
+
+## Participantes
+
+- Arthur Schurhaus
+- Estefano Gerassi Tuyama
+- Gean Pereira
+- Rafael Vieira Ferreira
+- Tom Sales Soares de Camargo
 
 
 
