@@ -1,8 +1,8 @@
 'use server';
 
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { db } from './db';
-import { imagesTable, postsTable } from './db/schema';
+import { followersTable, imagesTable, postsTable } from './db/schema';
 
 export async function getPostsByUserId({ userId }: { userId: string }) {
   const posts = await db
@@ -28,4 +28,21 @@ export async function getSinglePost({ postId }: { postId: number }) {
     post: post,
     postImages: postImages
   }
+}
+
+export async function getPostsByFollowing({ userId }: { userId: string }) {
+  const subQuery = db
+    .select({
+      followingId: followersTable.followingId,
+    })
+    .from(followersTable)
+    .where(eq(followersTable.userId, userId));
+
+  const posts = await db
+    .select()
+    .from(postsTable)
+    .where(inArray(postsTable.userId, subQuery))
+    .limit(30);
+
+  return posts;
 }
