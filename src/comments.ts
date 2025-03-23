@@ -1,42 +1,28 @@
 'use server';
 
-import { and, eq } from 'drizzle-orm';
 import { db } from './db';
 import { postsTable } from './db/schema';
+import { eq } from 'drizzle-orm';
 
-type Comment = typeof postsTable.$inferSelect;
-type CommentWithReplies = Comment & { replies: CommentWithReplies[] };
+type CommentNode = {
+  comment: number;
+  replies: CommentNode[];
+};
 
-export async function getCommentsForPost({ postId }: { postId: number }) {
-  const allComments = await db
-    .select()
+export async function getNestedComments(postId: number): Promise<CommentNode[]> {
+  const comments = await db
+    .select({ id: postsTable.id, postReference: postsTable.postReference })
     .from(postsTable)
-    .where(and(eq(postsTable.isComment, true)));
+    .where(eq(postsTable.postReference, postId));
 
-  const commentsById = new Map<number, CommentWithReplies>();
-  allComments.forEach((comment) => {
-    commentsById.set(comment.id, {
-      ...comment,
-      replies: [],
-    });
-  });
+  const buildTree = (parentId: number): CommentNode[] => {
+    return comments
+      .filter(comment => comment.postReference === parentId)
+      .map(comment => ({
+        comment: comment.id,
+        replies: buildTree(comment.id)
+      }));
+  };
 
-  const result: Array<{ rootComment: Comment; replies: CommentWithReplies[] }> =
-    [];
-
-  allComments.forEach((comment) => {
-    const commentWithReplies = commentsById.get(comment.id)!;
-
-    if (comment.postReference === postId) {
-      result.push({
-        rootComment: comment,
-        replies: commentWithReplies.replies,
-      });
-    } else if (commentsById.has(comment.postReference!)) {
-      const parentComment = commentsById.get(comment.postReference!)!;
-      parentComment.replies.push(commentWithReplies);
-    }
-  });
-
-  return result;
+  return buildTree(postId);
 }
