@@ -2,7 +2,8 @@
 
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from './db';
-import { followersTable } from './db/schema';
+import { followersTable, PostSelect } from './db/schema';
+import { clerkClient } from './db';
 
 export async function getRecommendedUsers({ userId }: { userId: string }) {
   const getPeopleUserFollowes = await db
@@ -22,4 +23,14 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
     .limit(10);
 
   return recommendedUsers;
+}
+
+export async function getUserByPost({ post }: { post: PostSelect }) {
+  const user = await clerkClient.users.getUser(post.userId);
+
+  return {
+    username: user.username,
+    userImageUrl: user.imageUrl,
+    fullName: user.fullName,
+  };
 }
