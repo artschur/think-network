@@ -1,5 +1,4 @@
 import { supabase } from '@/posts';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { boolean, index, integer, pgTable, varchar } from 'drizzle-orm/pg-core';
 
 export const postsTable = pgTable(

@@ -2,16 +2,10 @@
 
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import { db } from './db';
-import {
-  followersTable,
-  imagesTable,
-  mediaBucket,
-  postsTable,
-} from './db/schema';
+import { followersTable, imagesTable, postsTable } from './db/schema';
 import { auth } from '@clerk/nextjs/server';
-import { CreatePostInterface, UploadImageTemporary } from './interfaces';
+import { CreatePostInterface } from './interfaces';
 import { createClient } from '@supabase/supabase-js';
-import { randomUUIDv7 } from 'bun';
 import { uploadPostImages } from './images';
 
 export const supabase = createClient(
