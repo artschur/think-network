@@ -1,17 +1,31 @@
 'use server';
 
-import { and, desc, eq, inArray } from 'drizzle-orm';
-import { db } from './db';
-import { followersTable, imagesTable, postsTable } from './db/schema';
-import { auth } from '@clerk/nextjs/server';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { db, clerkClient } from './db';
+import {
+  followersTable,
+  imagesTable,
+  PostSelect,
+  postsTable,
+} from './db/schema';
+import { auth, User } from '@clerk/nextjs/server';
 import { CreatePostInterface } from './interfaces';
-import { createClient } from '@supabase/supabase-js';
 import { uploadPostImages } from './images';
-
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-);
+import { getUserByPost } from './users';
+interface PostImages {
+  id: number;
+  publicUrl: string;
+}
+export interface PostResponseWithUser {
+  post: PostSelect;
+  images: PostImages[] | [];
+  user: {
+    id: string;
+    username: string;
+    fullName: string;
+    profileImageUrl: string;
+  };
+}
 
 export async function getPostsByUserId({ userId }: { userId: string }) {
   const posts = await db
@@ -25,7 +39,7 @@ export async function getPostsByUserId({ userId }: { userId: string }) {
 }
 
 export async function getSinglePost({ postId }: { postId: number }) {
-  const [post, postImages] = await Promise.all([
+  const [posts, postImages] = await Promise.all([
     db
       .select()
       .from(postsTable)
@@ -33,27 +47,57 @@ export async function getSinglePost({ postId }: { postId: number }) {
     db.select().from(imagesTable).where(eq(imagesTable.postId, postId)),
   ]);
 
+  const post = posts[0];
+  if (!post) throw new Error('Post not found');
+  const user = getUserByPost({ post });
+  if (!user) throw new Error('User not found');
+
   return {
     post: post,
     postImages: postImages,
+    user: user,
   };
 }
 
-export async function getPostsByFollowing({ userId }: { userId: string }) {
-  const subQuery = db
+export async function getPostsByFollowing({
+  userId,
+}: {
+  userId: string;
+}): Promise<PostResponseWithUser[]> {
+  const postsWithImages = await db
     .select({
-      followingId: followersTable.followingId,
+      posts: postsTable,
+      images: sql<{ id: number; publicUrl: string }[]>`COALESCE(
+        json_agg(json_build_object('id', ${imagesTable.id}, 'publicUrl', ${imagesTable.publicUrl})) FILTER (WHERE ${imagesTable.id} IS NOT NULL),
+        '[]'::json
+      )`.as('images'),
     })
-    .from(followersTable)
-    .where(eq(followersTable.userId, userId));
-
-  const posts = await db
-    .select()
     .from(postsTable)
-    .where(inArray(postsTable.userId, subQuery))
+    .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
+    .where(and(eq(postsTable.isComment, false)))
+    .groupBy(postsTable.id)
+    .orderBy(desc(postsTable.createdAt))
     .limit(30);
 
-  return posts;
+  const userIds = [
+    ...new Set(postsWithImages.map((post) => post.posts.userId)),
+  ];
+  const users = (await clerkClient.users.getUserList({ userId: userIds })).data;
+
+  return postsWithImages.map((postWithImages) => {
+    const user = users.find((u) => u.id === postWithImages.posts.userId);
+    if (!user) throw new Error('User not found');
+    return {
+      post: postWithImages.posts,
+      images: postWithImages.images || [],
+      user: {
+        id: user.id,
+        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        username: user.username || '',
+        profileImageUrl: user.imageUrl || '',
+      },
+    };
+  });
 }
 
 export async function createPost({

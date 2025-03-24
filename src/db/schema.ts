@@ -1,5 +1,12 @@
-import { supabase } from '@/posts';
-import { boolean, index, integer, pgTable, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  date,
+  index,
+  integer,
+  pgTable,
+  varchar,
+} from 'drizzle-orm/pg-core';
+import { supabase } from '.';
 
 export const postsTable = pgTable(
   'posts',
@@ -10,7 +17,8 @@ export const postsTable = pgTable(
     content: varchar().notNull(),
     isComment: boolean().notNull(),
     likeCount: integer().notNull().default(0),
-    createdAt: integer().notNull().default(Date.now()),
+    commentCount: integer().notNull().default(0),
+    createdAt: date().notNull().defaultNow(),
   },
   (table) => {
     return {
@@ -55,3 +63,5 @@ export const mediaBucket = supabase.storage.createBucket('media', {
   public: true,
   fileSizeLimit: 1024 * 1024 * 10, // 10MB
 });
+
+export type PostSelect = typeof postsTable.$inferSelect;

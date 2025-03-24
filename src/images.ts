@@ -1,8 +1,8 @@
 'use server';
 
-import { randomUUIDv7 } from 'bun';
+import { randomUUID } from 'crypto';
 import { UploadImageTemporary } from './interfaces';
-import { supabase } from './posts';
+import { supabase } from './db';
 import { db } from './db';
 import { imagesTable } from './db/schema';
 
@@ -16,7 +16,7 @@ export async function uploadPostImages({
   const imagesToInsert: UploadImageTemporary[] = [];
 
   for (const image of images) {
-    const imageName = randomUUIDv7();
+    const imageName = randomUUID();
     const imagePath = `posts/${postId}/${imageName}`;
 
     const { error } = await supabase.storage
