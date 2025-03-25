@@ -1,27 +1,28 @@
-import { Suspense } from 'react';
-import Sidebar from '@/components/sidebar';
-import TweetInput from '@/components/tweet-input';
-import TweetFeed from '@/components/tweet-feed';
-import TrendingTopics from '@/components/trending-topics';
-import WhoToFollow from '@/components/who-to-follow';
-import { Skeleton } from '@/components/ui/skeleton';
-import BackgroundImages from '@/components/background-images';
+import { Suspense } from "react"
+import Sidebar from "@/components/sidebar"
+import TweetInput from "@/components/tweet-input"
+import TweetFeed from "@/components/tweet-feed"
+import TrendingTopics from "@/components/trending-topics"
+import WhoToFollow from "@/components/who-to-follow"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Search } from "lucide-react"
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-50 dark:bg-slate-900">
-      {/* Background images */}
-      <BackgroundImages />
-
-      <div className="container mx-auto flex min-h-screen py-6 gap-6 relative z-10">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto flex min-h-screen py-6 gap-6">
         {/* Left sidebar */}
         <Sidebar />
 
         {/* Main content */}
         <main className="flex-1 max-w-xl">
-          <div className="sticky top-0 z-10 backdrop-blur-xl bg-white/40 dark:bg-slate-900/40 rounded-2xl mb-6 p-4 shadow-lg border border-white/20 dark:border-slate-700/20 backdrop-filter">
-            <h1 className="text-2xl font-medium">Timeline</h1>
-          </div>
+          <Card className="sticky top-0 z-10 mb-6 border-b">
+            <CardHeader className="pb-3">
+              <CardTitle>Timeline</CardTitle>
+            </CardHeader>
+          </Card>
 
           <TweetInput />
 
@@ -34,30 +35,56 @@ export default function HomePage() {
         <div className="hidden lg:flex flex-col w-80 space-y-6 sticky top-6 h-[calc(100vh-3rem)]">
           {/* Search bar */}
           <div className="relative">
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-full py-3 px-5 pl-12 shadow-lg border border-white/20 dark:border-slate-700/20 focus:outline-none focus:ring-2 focus:ring-blue-400/30 transition-all"
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 absolute left-4 top-3.5 text-slate-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search" className="pl-9 rounded-full" />
           </div>
 
           <Suspense
             fallback={
-              <div className="rounded-3xl bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl p-4 h-64 animate-pulse shadow-lg border border-white/20 dark:border-slate-700/20" />
+              <Card className="h-64">
+                <CardHeader>
+                  <Skeleton className="h-6 w-24" />
+                </CardHeader>
+                <div className="p-6 space-y-4">
+                  {Array(4)
+                    .fill(0)
+                    .map((_, i) => (
+                      <div key={i} className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    ))}
+                </div>
+              </Card>
+            }
+          >
+            <TrendingTopics />
+          </Suspense>
+
+          <Suspense
+            fallback={
+              <Card className="h-64">
+                <CardHeader>
+                  <Skeleton className="h-6 w-24" />
+                </CardHeader>
+                <div className="p-6 space-y-4">
+                  {Array(3)
+                    .fill(0)
+                    .map((_, i) => (
+                      <div key={i} className="flex justify-between">
+                        <div className="flex gap-3">
+                          <Skeleton className="h-10 w-10 rounded-full" />
+                          <div className="space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-4 w-16" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-9 w-16 rounded-full" />
+                      </div>
+                    ))}
+                </div>
+              </Card>
             }
           >
             <WhoToFollow />
@@ -65,7 +92,7 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function TweetFeedSkeleton() {
@@ -74,10 +101,7 @@ function TweetFeedSkeleton() {
       {Array(5)
         .fill(0)
         .map((_, i) => (
-          <div
-            key={i}
-            className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl p-6 shadow-lg border border-white/20 dark:border-slate-700/20"
-          >
+          <Card key={i} className="p-6">
             <div className="flex gap-4">
               <Skeleton className="h-12 w-12 rounded-full" />
               <div className="flex-1 space-y-3">
@@ -92,12 +116,12 @@ function TweetFeedSkeleton() {
                   <Skeleton className="h-8 w-8 rounded-full" />
                   <Skeleton className="h-8 w-8 rounded-full" />
                   <Skeleton className="h-8 w-8 rounded-full" />
-                  <Skeleton className="h-8 w-8 rounded-full" />
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         ))}
     </div>
-  );
+  )
 }
+

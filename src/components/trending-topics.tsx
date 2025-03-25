@@ -1,3 +1,6 @@
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+
 async function getTrendingTopics() {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -16,29 +19,30 @@ export default async function TrendingTopics() {
   const topics = await getTrendingTopics()
 
   return (
-    <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl overflow-hidden shadow-lg border border-white/20 dark:border-slate-700/20 backdrop-filter">
-      <h2 className="text-xl font-medium p-5 border-b border-white/20 dark:border-slate-700/20">Trending</h2>
+    <Card>
+      <CardHeader>
+        <CardTitle>Trending</CardTitle>
+      </CardHeader>
 
-      <div>
-        {topics.map((topic) => (
-          <div
-            key={topic.id}
-            className="px-5 py-4 hover:bg-white/40 dark:hover:bg-slate-700/40 transition-all cursor-pointer"
-          >
-            <div className="text-xs text-slate-500 dark:text-slate-400">{topic.category}</div>
-            <div className="font-medium mt-1">{topic.name}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{topic.tweets} posts</div>
+      <CardContent className="p-0">
+        {topics.map((topic, index) => (
+          <div key={topic.id}>
+            <div className="px-6 py-3 hover:bg-accent transition-all cursor-pointer">
+              <div className="text-xs text-muted-foreground">{topic.category}</div>
+              <div className="font-medium mt-1 text-foreground">{topic.name}</div>
+              <div className="text-xs text-muted-foreground mt-1">{topic.tweets} posts</div>
+            </div>
+            {index < topics.length - 1 && <Separator />}
           </div>
         ))}
-      </div>
+      </CardContent>
 
-      <a
-        href="#"
-        className="block p-5 text-blue-500 hover:bg-white/40 dark:hover:bg-slate-700/40 transition-all border-t border-white/20 dark:border-slate-700/20"
-      >
-        Show more
-      </a>
-    </div>
+      <CardFooter className="p-0">
+        <a href="#" className="block w-full p-4 text-primary hover:bg-accent transition-all text-center">
+          Show more
+        </a>
+      </CardFooter>
+    </Card>
   )
 }
 
