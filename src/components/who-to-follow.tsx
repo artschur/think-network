@@ -1,35 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-
-async function getWhoToFollow() {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  // Mock data
-  return [
-    {
-      id: 1,
-      name: 'Tech Insider',
-      username: 'techinsider',
-      avatar: '/placeholder.svg?height=40&width=40',
-    },
-    {
-      id: 2,
-      name: 'Web Dev News',
-      username: 'webdevnews',
-      avatar: '/placeholder.svg?height=40&width=40',
-    },
-    {
-      id: 3,
-      name: 'Design Trends',
-      username: 'designtrends',
-      avatar: '/placeholder.svg?height=40&width=40',
-    },
-  ];
-}
+import { getRecommendedUsers } from '@/users';
+import { auth } from '@clerk/nextjs/server';
 
 export default async function WhoToFollow() {
-  const users = await getWhoToFollow();
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+  const users = await getRecommendedUsers({ userId: userId });
 
   return (
     <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl overflow-hidden shadow-lg border border-white/20 dark:border-slate-700/20 backdrop-filter">
@@ -45,13 +24,13 @@ export default async function WhoToFollow() {
           >
             <div className="flex items-center gap-3">
               <Avatar className="ring-2 ring-white/30 dark:ring-slate-700/30 shadow-md">
-                <AvatarFallback>{user.name[0]}</AvatarFallback>
-                <AvatarImage src={user.avatar} />
+                <AvatarFallback>{user.username}</AvatarFallback>
+                <AvatarImage src={user.profilePic} />
               </Avatar>
 
               <div>
                 <div className="font-medium hover:text-blue-500 transition-colors">
-                  {user.name}
+                  {user.fullName}
                 </div>
                 <div className="text-sm text-slate-500 dark:text-slate-400">
                   @{user.username}

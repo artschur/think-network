@@ -60,14 +60,6 @@ export default function HomePage() {
               <div className="rounded-3xl bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl p-4 h-64 animate-pulse shadow-lg border border-white/20 dark:border-slate-700/20" />
             }
           >
-            <TrendingTopics />
-          </Suspense>
-
-          <Suspense
-            fallback={
-              <div className="rounded-3xl bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl p-4 h-64 animate-pulse shadow-lg border border-white/20 dark:border-slate-700/20" />
-            }
-          >
             <WhoToFollow />
           </Suspense>
         </div>

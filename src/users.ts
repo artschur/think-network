@@ -22,7 +22,19 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
     .where(and(inArray(followersTable.userId, followingIds)))
     .limit(10);
 
-  return recommendedUsers;
+  const usersInfo = await clerkClient.users.getUserList({
+    userId: recommendedUsers.map((user) => user.userId),
+    limit: 10,
+  });
+
+  const mappedUsers = usersInfo.data.map((user) => ({
+    id: user.id,
+    username: user.username,
+    fullName: user.fullName,
+    profilePic: user.imageUrl,
+  }));
+
+  return mappedUsers;
 }
 
 export async function getUserByPost({ post }: { post: PostSelect }) {
