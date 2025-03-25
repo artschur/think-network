@@ -64,6 +64,16 @@ export async function getPostsByFollowing({
 }: {
   userId: string;
 }): Promise<PostResponseWithUser[]> {
+  const onlyPeopleIFollow = await db
+    .select({
+      followingId: followersTable.followingId,
+    })
+    .from(followersTable)
+    .where(eq(followersTable.userId, userId));
+
+  const followingIds = onlyPeopleIFollow.map((follow) => follow.followingId);
+  followingIds.push(userId); // add myself to the list
+
   const postsWithImages = await db
     .select({
       posts: postsTable,
@@ -74,7 +84,12 @@ export async function getPostsByFollowing({
     })
     .from(postsTable)
     .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
-    .where(and(eq(postsTable.isComment, false)))
+    .where(
+      and(
+        eq(postsTable.isComment, false),
+        inArray(postsTable.userId, followingIds),
+      ),
+    )
     .groupBy(postsTable.id)
     .orderBy(desc(postsTable.createdAt))
     .limit(30);
