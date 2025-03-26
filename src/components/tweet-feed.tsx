@@ -1,13 +1,7 @@
 import Tweet from '@/components/tweet';
 import { getPostsByFollowing } from '@/posts';
-import { auth } from '@clerk/nextjs/server';
 
-export default async function TweetFeed() {
-  const { userId } = await auth();
-  if (!userId) {
-    throw new Error('User not authenticated');
-  }
-
+export default async function TweetFeed({ userId }: { userId: string }) {
   const tweets = await getPostsByFollowing({ userId });
 
   return (

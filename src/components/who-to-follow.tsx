@@ -7,13 +7,8 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { getRecommendedUsers } from '@/users';
-import { auth } from '@clerk/nextjs/server';
 
-export default async function WhoToFollow() {
-  const { userId } = await auth();
-  if (!userId) {
-    throw new Error('User not authenticated');
-  }
+export default async function WhoToFollow({ userId }: { userId: string }) {
   const users = await getRecommendedUsers({ userId: userId });
 
   if (users.length <= 0) {

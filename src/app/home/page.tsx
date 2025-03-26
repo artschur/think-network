@@ -7,8 +7,15 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search } from 'lucide-react';
+import { auth } from '@clerk/nextjs/server';
 
-export default function Home() {
+export default async function Home() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error('User must be authenticaded');
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto flex min-h-screen py-6 gap-6">
@@ -26,7 +33,7 @@ export default function Home() {
           <TweetInput />
 
           <Suspense fallback={<TweetFeedSkeleton />}>
-            <TweetFeed />
+            <TweetFeed userId={userId} />
           </Suspense>
         </main>
 
@@ -66,7 +73,7 @@ export default function Home() {
               </Card>
             }
           >
-            <WhoToFollow />
+            <WhoToFollow userId={userId} />
           </Suspense>
         </div>
       </div>

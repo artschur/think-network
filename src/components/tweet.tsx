@@ -1,32 +1,32 @@
-"use client"
+'use client';
 
-import { MessageCircle, Heart, Share } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { useState } from "react"
-import Image from "next/image"
-import { cn } from "@/lib/utils"
+import { MessageCircle, Heart, Share } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 interface PostResponseWithUser {
   post: {
-    id: string
-    content: string
-    createdAt: string
-    likeCount: number
-    commentCount: number
-  }
+    id: number;
+    content: string;
+    createdAt: string;
+    likeCount: number;
+    commentCount: number;
+  };
   user: {
-    id: string
-    fullName: string
-    username: string
-    profileImageUrl: string
-  }
-  images?: { publicUrl: string }[]
+    id: string;
+    fullName: string;
+    username: string;
+    profileImageUrl: string;
+  };
+  images?: { publicUrl: string }[];
 }
 
 export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
-  const [liked, setLiked] = useState(false)
+  const [liked, setLiked] = useState(false);
 
   return (
     <Card>
@@ -42,19 +42,25 @@ export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
               <span className="font-medium hover:text-primary transition-colors text-foreground">
                 {tweet.user?.fullName}
               </span>
-              <span className="text-muted-foreground">@{tweet.user?.username}</span>
+              <span className="text-muted-foreground">
+                @{tweet.user?.username}
+              </span>
               <span className="text-muted-foreground">·</span>
-              <span className="text-muted-foreground hover:text-primary transition-colors">{tweet.post.createdAt}</span>
+              <span className="text-muted-foreground hover:text-primary transition-colors">
+                {tweet.post.createdAt}
+              </span>
             </div>
 
-            <div className="mt-2 text-[15px] leading-relaxed text-foreground">{tweet.post.content}</div>
+            <div className="mt-2 text-[15px] leading-relaxed text-foreground">
+              {tweet.post.content}
+            </div>
 
             {tweet.images && tweet.images.length > 0 && (
               <div className="mt-3 rounded-md overflow-hidden grid grid-cols-1 gap-2">
                 {tweet.images.map((image, index) => (
                   <div key={index} className="overflow-hidden rounded-md">
                     <Image
-                      src={image.publicUrl || "/placeholder.svg"}
+                      src={image.publicUrl || '/placeholder.svg'}
                       alt={`Tweet image ${index + 1}`}
                       width={500}
                       height={280}
@@ -79,15 +85,20 @@ export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "rounded-full flex items-center gap-1",
+                  'rounded-full flex items-center gap-1',
                   liked
-                    ? "text-destructive hover:text-destructive hover:bg-destructive/10"
-                    : "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
+                    ? 'text-destructive hover:text-destructive hover:bg-destructive/10'
+                    : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
                 )}
                 onClick={() => setLiked(!liked)}
               >
-                <Heart className="h-4 w-4" fill={liked ? "currentColor" : "none"} />
-                <span className="text-xs ml-1">{liked ? tweet.post.likeCount + 1 : tweet.post.likeCount}</span>
+                <Heart
+                  className="h-4 w-4"
+                  fill={liked ? 'currentColor' : 'none'}
+                />
+                <span className="text-xs ml-1">
+                  {liked ? tweet.post.likeCount + 1 : tweet.post.likeCount}
+                </span>
               </Button>
 
               <Button
@@ -102,6 +113,5 @@ export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
