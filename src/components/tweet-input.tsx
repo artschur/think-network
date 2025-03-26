@@ -1,24 +1,29 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState } from "react"
-import { Image, BarChart2, Smile, Calendar } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useState } from 'react';
+import { Image, BarChart2, Smile, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export default function TweetInput() {
-  const [tweet, setTweet] = useState("")
+  const [tweet, setTweet] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle tweet submission
-    console.log("Tweet submitted:", tweet)
-    setTweet("")
-  }
+    console.log('Tweet submitted:', tweet);
+    setTweet('');
+  };
 
   return (
     <Card className="mb-6">
@@ -34,7 +39,7 @@ export default function TweetInput() {
               value={tweet}
               onChange={(e) => setTweet(e.target.value)}
               placeholder="What's on your mind?"
-              className="w-full border-none focus-visible:ring-0 text-lg resize-none min-h-[80px] p-0"
+              className="w-full border-none focus-visible:ring-0 text-lg resize-none min-h-[80px] p-4"
             />
 
             <div className="flex justify-between items-center mt-4">
@@ -42,7 +47,12 @@ export default function TweetInput() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button type="button" size="icon" variant="ghost" className="rounded-full h-9 w-9">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="rounded-full h-9 w-9"
+                      >
                         <Image className="h-5 w-5" />
                       </Button>
                     </TooltipTrigger>
@@ -53,7 +63,12 @@ export default function TweetInput() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button type="button" size="icon" variant="ghost" className="rounded-full h-9 w-9">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="rounded-full h-9 w-9"
+                      >
                         <BarChart2 className="h-5 w-5" />
                       </Button>
                     </TooltipTrigger>
@@ -64,7 +79,12 @@ export default function TweetInput() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button type="button" size="icon" variant="ghost" className="rounded-full h-9 w-9">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="rounded-full h-9 w-9"
+                      >
                         <Smile className="h-5 w-5" />
                       </Button>
                     </TooltipTrigger>
@@ -75,7 +95,12 @@ export default function TweetInput() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button type="button" size="icon" variant="ghost" className="rounded-full h-9 w-9">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="rounded-full h-9 w-9"
+                      >
                         <Calendar className="h-5 w-5" />
                       </Button>
                     </TooltipTrigger>
@@ -84,7 +109,11 @@ export default function TweetInput() {
                 </TooltipProvider>
               </div>
 
-              <Button type="submit" className="rounded-full" disabled={!tweet.trim()}>
+              <Button
+                type="submit"
+                className="rounded-full"
+                disabled={!tweet.trim()}
+              >
                 Post
               </Button>
             </div>
@@ -92,6 +121,5 @@ export default function TweetInput() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

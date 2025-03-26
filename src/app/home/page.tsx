@@ -1,13 +1,12 @@
-import { Suspense } from "react"
-import Sidebar from "@/components/sidebar"
-import TweetInput from "@/components/tweet-input"
-import TweetFeed from "@/components/tweet-feed"
-import TrendingTopics from "@/components/trending-topics"
-import WhoToFollow from "@/components/who-to-follow"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Search } from "lucide-react"
+import { Suspense } from 'react';
+import Sidebar from '@/components/sidebar';
+import TweetInput from '@/components/tweet-input';
+import TweetFeed from '@/components/tweet-feed';
+import WhoToFollow from '@/components/who-to-follow';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Search } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -36,31 +35,11 @@ export default function Home() {
           {/* Search bar */}
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search" className="pl-9 rounded-full" />
+            <Input
+              placeholder="Search"
+              className="pl-9 rounded-full bg-primary"
+            />
           </div>
-
-          <Suspense
-            fallback={
-              <Card className="h-64">
-                <CardHeader>
-                  <Skeleton className="h-6 w-24" />
-                </CardHeader>
-                <div className="p-6 space-y-4">
-                  {Array(4)
-                    .fill(0)
-                    .map((_, i) => (
-                      <div key={i} className="space-y-2">
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-4 w-20" />
-                      </div>
-                    ))}
-                </div>
-              </Card>
-            }
-          >
-            <TrendingTopics />
-          </Suspense>
 
           <Suspense
             fallback={
@@ -92,7 +71,7 @@ export default function Home() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function TweetFeedSkeleton() {
@@ -122,6 +101,5 @@ function TweetFeedSkeleton() {
           </Card>
         ))}
     </div>
-  )
+  );
 }
-

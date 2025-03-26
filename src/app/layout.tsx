@@ -35,7 +35,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased dark:text-white`}
         >
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <header className="flex justify-end items-center p-4 gap-4 h-16">

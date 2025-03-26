@@ -16,8 +16,21 @@ export default async function WhoToFollow() {
   }
   const users = await getRecommendedUsers({ userId: userId });
 
+  if (users.length <= 0) {
+    return (
+      <Card className="backdrop-blur-xl overflow-x-hidden shadow-lg border backdrop-filter">
+        <CardHeader className="border-b">
+          <h2 className="text-xl font-medium">Who to follow</h2>
+        </CardHeader>
+        <CardContent className="p-0 px-5 py-4 text-muted-foreground">
+          No recommendations available at this time.
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="backdrop-blur-xl overflow-hidden shadow-lg border backdrop-filter">
+    <Card className="backdrop-blur-xl overflow-x-hidden shadow-lg border backdrop-filter">
       <CardHeader className="border-b">
         <h2 className="text-xl font-medium">Who to follow</h2>
       </CardHeader>
