@@ -6,15 +6,15 @@ import { followersTable, PostSelect } from './db/schema';
 import { clerkClient } from './db';
 
 export async function getRecommendedUsers({ userId }: { userId: string }) {
-  const getPeopleUserFollowes = await db
+  const getPeopleUserFollows = await db
     .select({ following: followersTable.followingId })
     .from(followersTable)
     .where(eq(followersTable.userId, userId))
     .limit(5);
 
-  const followingIds: string[] = getPeopleUserFollowes
-    .map((follower) => follower.following)
-    .filter((followingId) => followingId !== userId);
+  const followingIds: string[] = getPeopleUserFollows.map(
+    (follower) => follower.following,
+  );
 
   const recommendedUsers = await db // get users other users others follow
     .select({ userId: followersTable.followingId })
@@ -22,8 +22,16 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
     .where(and(inArray(followersTable.userId, followingIds)))
     .limit(10);
 
+  const filteredArray = recommendedUsers
+    .map((user) => `+${user.userId}`)
+    .filter((id) => id !== `+${userId}`);
+
+  if (filteredArray.length === 0) {
+    return [];
+  }
+
   const usersInfo = await clerkClient.users.getUserList({
-    userId: recommendedUsers.map((user) => user.userId),
+    userId: filteredArray,
     limit: 10,
   });
 
@@ -33,7 +41,6 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
     fullName: user.fullName,
     profilePic: user.imageUrl,
   }));
-
   return mappedUsers;
 }
 
