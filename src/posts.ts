@@ -72,7 +72,7 @@ export async function getPostsByFollowing({
     .where(eq(followersTable.userId, userId));
 
   const followingIds = onlyPeopleIFollow.map((follow) => follow.followingId);
-  followingIds.push(userId); // add myself to the list
+  followingIds.push(userId);
 
   const postsWithImages = await db
     .select({
@@ -147,4 +147,41 @@ export async function createPost({
     postId: id,
     publicUrls: publicUrls.publicUrls,
   };
+}
+
+
+export async function getTopPosts() {
+  const postsWithImages = await db
+    .select({
+      posts: postsTable,
+      images: sql<{ id: number; publicUrl: string }[]>`COALESCE(
+        json_agg(json_build_object('id', ${imagesTable.id}, 'publicUrl', ${imagesTable.publicUrl})) FILTER (WHERE ${imagesTable.id} IS NOT NULL),
+        '[]'::json
+      )`.as('images'),
+      engagement: sql<number>`${postsTable.likeCount} + ${postsTable.commentCount}`.as('engagement'),
+    })
+    .from(postsTable)
+    .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
+    .where(eq(postsTable.isComment, false))
+    .groupBy(postsTable.id)
+    .orderBy(desc(sql`engagement`))
+    .limit(30);
+
+  const userIds = [...new Set(postsWithImages.map((post) => post.posts.userId))];
+  const users = (await clerkClient.users.getUserList({ userId: userIds })).data;
+
+  return postsWithImages.map((postWithImages) => {
+    const user = users.find((u) => u.id === postWithImages.posts.userId);
+    if (!user) throw new Error('User not found');
+    return {
+      post: postWithImages.posts,
+      images: postWithImages.images || [],
+      user: {
+        id: user.id,
+        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        username: user.username || '',
+        profileImageUrl: user.imageUrl || '',
+      },
+    };
+  });
 }
