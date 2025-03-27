@@ -39,7 +39,7 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo }) {
             <div className="flex items-center gap-3">
               <Avatar className="ring-2 ring-muted/30 shadow-md">
                 <AvatarFallback>{user.username}</AvatarFallback>
-                <AvatarImage src={user.profilePic} />
+                <AvatarImage src={user.imageUrl} />
               </Avatar>
 
               <div>
