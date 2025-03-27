@@ -8,7 +8,7 @@ import {
   PostSelect,
   postsTable,
 } from './db/schema';
-import { auth, User } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { CreatePostInterface } from './interfaces';
 import { uploadPostImages } from './images';
 import { getUserByPost } from './users';
