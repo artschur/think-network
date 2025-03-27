@@ -7,14 +7,21 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search } from 'lucide-react';
-import { auth } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
+import { SimpleUserInfo } from '@/users';
 
 export default async function Home() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error('User must be authenticaded');
+  const response = await currentUser();
+  if (!response) {
+    throw new Error('User not authenticaded');
   }
+
+  const userDTO: SimpleUserInfo = {
+    id: response.id,
+    username: response?.username,
+    fullName: response?.fullName,
+    imageUrl: response?.imageUrl,
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,10 +37,10 @@ export default async function Home() {
             </CardHeader>
           </Card>
 
-          <TweetInput />
+          <TweetInput user={userDTO} />
 
           <Suspense fallback={<TweetFeedSkeleton />}>
-            <TweetFeed userId={userId} />
+            <TweetFeed user={userDTO} />
           </Suspense>
         </main>
 
@@ -73,7 +80,7 @@ export default async function Home() {
               </Card>
             }
           >
-            <WhoToFollow userId={userId} />
+            <WhoToFollow user={userDTO} />
           </Suspense>
         </div>
       </div>

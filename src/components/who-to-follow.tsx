@@ -6,10 +6,10 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import { getRecommendedUsers } from '@/users';
+import { getRecommendedUsers, SimpleUserInfo } from '@/users';
 
-export default async function WhoToFollow({ userId }: { userId: string }) {
-  const users = await getRecommendedUsers({ userId: userId });
+export default async function WhoToFollow({ user }: { user: SimpleUserInfo }) {
+  const users = await getRecommendedUsers({ userId: user.id });
 
   if (users.length <= 0) {
     return (

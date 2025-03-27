@@ -14,8 +14,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { User } from '@clerk/nextjs/server';
+import { SimpleUserInfo } from '@/users';
 
-export default function TweetInput() {
+export default function TweetInput({ user }: { user: SimpleUserInfo }) {
   const [tweet, setTweet] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,9 +33,9 @@ export default function TweetInput() {
         <div className="flex gap-4">
           <Avatar className="h-12 w-12">
             <AvatarFallback>U</AvatarFallback>
-            <AvatarImage src="/placeholder.svg?height=48&width=48" />
+            <AvatarImage src={user.imageUrl} />
           </Avatar>
-
+          <h1>@{user.username}</h1>
           <form className="flex-1" onSubmit={handleSubmit}>
             <Textarea
               value={tweet}
