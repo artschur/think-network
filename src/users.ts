@@ -1,6 +1,6 @@
 'use server';
 
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, desc, count } from 'drizzle-orm';
 import { db } from './db';
 import { followersTable, PostSelect } from './db/schema';
 import { clerkClient } from './db';
@@ -23,15 +23,26 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
     (follower) => follower.following,
   );
 
-  const recommendedUsers = await db // get users other users others follow
-    .select({ userId: followersTable.followingId })
-    .from(followersTable)
-    .where(and(inArray(followersTable.userId, followingIds)))
-    .limit(10);
+  let recommendedUsers;
+
+  if (followingIds.length > 0) {
+    recommendedUsers = await db
+      .select({ userId: followersTable.followingId })
+      .from(followersTable)
+      .where(and(inArray(followersTable.userId, followingIds)))
+      .limit(10);
+  } else {
+    recommendedUsers = await db
+      .select({ userId: followersTable.followingId })
+      .from(followersTable)
+      .groupBy(followersTable.followingId)
+      .orderBy(desc(count(followersTable.followingId)))
+      .limit(10);
+  }
 
   const filteredArray = recommendedUsers
-    .map((user) => `+${user.userId}`)
-    .filter((id) => id !== `+${userId}`);
+    .map((user) => user.userId)
+    .filter((id) => id !== userId);
 
   if (filteredArray.length === 0) {
     return [];
@@ -42,13 +53,12 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
     limit: 10,
   });
 
-  const mappedUsers = usersInfo.data.map((user) => ({
+  return usersInfo.data.map((user) => ({
     id: user.id,
     username: user.username,
     fullName: user.fullName,
-    profilePic: user.imageUrl,
+    imageUrl: user.imageUrl,
   }));
-  return mappedUsers;
 }
 
 export async function getUserByPost({ post }: { post: PostSelect }) {
