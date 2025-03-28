@@ -1,14 +1,11 @@
 import Tweet from '@/components/tweet';
-import { getTopPosts } from '@/posts';
-import { SimpleUserInfo } from '@/users';
+import { TweetWithUser } from '@/interfaces';
 
-export default async function FeaturedFeed({
-  user,
+export default function TweetFeed({
+  tweets,
 }: {
-  user: SimpleUserInfo;
+  tweets: TweetWithUser[];
 }) {
-  const tweets = await getTopPosts();
-
   return (
     <div className="space-y-6">
       {tweets.map((tweet) => (

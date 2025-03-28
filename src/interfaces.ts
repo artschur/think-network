@@ -9,3 +9,20 @@ export interface UploadImageTemporary {
   publicUrl: string;
   storagePath: string;
 }
+
+export interface TweetWithUser {
+  post: {
+  id: number;
+  content: string;
+  createdAt: Date;
+  likeCount: number;
+  commentCount: number;
+  };
+  user: {
+  id: string;
+  fullName: string;
+  username: string;
+  profileImageUrl: string;
+  };
+  images?: { publicUrl: string }[];
+}
