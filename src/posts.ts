@@ -138,17 +138,21 @@ export async function createPost({
 
   if (!id) throw new Error('Error creating post');
 
-  const publicUrls = await uploadPostImages({
-    postId: id,
-    images: postContent.imagesUrl,
-  });
+  if (postContent.imagesUrl && postContent.imagesUrl.length > 0) {
+    const publicUrls = await uploadPostImages({
+      postId: id,
+      images: postContent.imagesUrl,
+    });
+    return {
+      postId: id,
+      publicUrls: publicUrls?.publicUrls,
+    };
+  }
 
   return {
     postId: id,
-    publicUrls: publicUrls.publicUrls,
   };
 }
-
 
 export async function getTopPosts() {
   const postsWithImages = await db
@@ -158,7 +162,10 @@ export async function getTopPosts() {
         json_agg(json_build_object('id', ${imagesTable.id}, 'publicUrl', ${imagesTable.publicUrl})) FILTER (WHERE ${imagesTable.id} IS NOT NULL),
         '[]'::json
       )`.as('images'),
-      engagement: sql<number>`${postsTable.likeCount} + ${postsTable.commentCount}`.as('engagement'),
+      engagement:
+        sql<number>`${postsTable.likeCount} + ${postsTable.commentCount}`.as(
+          'engagement',
+        ),
     })
     .from(postsTable)
     .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
@@ -167,7 +174,9 @@ export async function getTopPosts() {
     .orderBy(desc(sql`engagement`))
     .limit(30);
 
-  const userIds = [...new Set(postsWithImages.map((post) => post.posts.userId))];
+  const userIds = [
+    ...new Set(postsWithImages.map((post) => post.posts.userId)),
+  ];
   const users = (await clerkClient.users.getUserList({ userId: userIds })).data;
 
   return postsWithImages.map((postWithImages) => {
