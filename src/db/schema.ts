@@ -1,9 +1,9 @@
 import {
   boolean,
-  date,
   index,
   integer,
   pgTable,
+  timestamp,
   varchar,
 } from 'drizzle-orm/pg-core';
 import { supabase } from '.';
@@ -18,7 +18,7 @@ export const postsTable = pgTable(
     isComment: boolean().notNull(),
     likeCount: integer().notNull().default(0),
     commentCount: integer().notNull().default(0),
-    createdAt: date().notNull().defaultNow(),
+    createdAt: timestamp().notNull().defaultNow(),
   },
   (table) => {
     return {

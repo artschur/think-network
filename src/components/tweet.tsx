@@ -12,7 +12,7 @@ interface PostResponseWithUser {
   post: {
     id: number;
     content: string;
-    createdAt: string;
+    createdAt: Date;
     likeCount: number;
     commentCount: number;
   };
@@ -47,7 +47,11 @@ export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
               </span>
               <span className="text-muted-foreground">·</span>
               <span className="text-muted-foreground hover:text-primary transition-colors">
-                {tweet.post.createdAt}
+                {new Date(tweet.post.createdAt).toLocaleDateString()} at{' '}
+                {new Date(tweet.post.createdAt).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </span>
             </div>
 
