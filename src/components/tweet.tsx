@@ -28,7 +28,6 @@ interface PostResponseWithUser {
 export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
   const [liked, setLiked] = useState(false);
 
-  // Convert images to the format expected by ImageGrid
   const gridImages: GridImage[] =
     tweet.images?.map((img, index) => ({
       id: `tweet-${tweet.post.id}-image-${index}`,
@@ -66,7 +65,6 @@ export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
               {tweet.post.content}
             </div>
 
-            {/* Use the new ImageGrid component */}
             {gridImages.length > 0 && (
               <ImageGrid images={gridImages} className="mt-3" />
             )}
