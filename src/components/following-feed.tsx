@@ -2,7 +2,11 @@ import Tweet from '@/components/tweet';
 import { getPostsByFollowing } from '@/posts';
 import { SimpleUserInfo } from '@/users';
 
-export default async function TweetFeed({ user }: { user: SimpleUserInfo }) {
+export default async function FollowingFeed({
+  user,
+}: {
+  user: SimpleUserInfo;
+}) {
   const tweets = await getPostsByFollowing({ userId: user.id });
 
   return (

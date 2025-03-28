@@ -1,7 +1,8 @@
 import { Suspense } from 'react';
 import Sidebar from '@/components/sidebar';
 import TweetInput from '@/components/tweet-input';
-import TweetFeed from '@/components/tweet-feed';
+import FollowingFeed from '@/components/following-feed';
+// import FeaturedFeed from '@/components/featured-feed';
 import WhoToFollow from '@/components/who-to-follow';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -40,7 +41,7 @@ export default async function Home() {
           <TweetInput user={userDTO} />
 
           <Suspense fallback={<TweetFeedSkeleton />}>
-            <TweetFeed user={userDTO} />
+            <FollowingFeed user={userDTO} />
           </Suspense>
         </main>
 
