@@ -5,8 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import ImageGrid, { GridImage } from '@/components/image-grid';
 
 interface PostResponseWithUser {
   post: {
@@ -27,6 +27,13 @@ interface PostResponseWithUser {
 
 export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
   const [liked, setLiked] = useState(false);
+
+  // Convert images to the format expected by ImageGrid
+  const gridImages: GridImage[] =
+    tweet.images?.map((img, index) => ({
+      id: `tweet-${tweet.post.id}-image-${index}`,
+      url: img.publicUrl || '/placeholder.svg',
+    })) || [];
 
   return (
     <Card>
@@ -59,20 +66,9 @@ export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
               {tweet.post.content}
             </div>
 
-            {tweet.images && tweet.images.length > 0 && (
-              <div className="mt-3 rounded-md overflow-hidden grid grid-cols-1 gap-2">
-                {tweet.images.map((image, index) => (
-                  <div key={index} className="overflow-hidden rounded-md">
-                    <Image
-                      src={image.publicUrl || '/placeholder.svg'}
-                      alt={`Tweet image ${index + 1}`}
-                      width={500}
-                      height={280}
-                      className="w-full h-auto object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
+            {/* Use the new ImageGrid component */}
+            {gridImages.length > 0 && (
+              <ImageGrid images={gridImages} className="mt-3" />
             )}
 
             <div className="mt-6 flex justify-between max-w-md">
