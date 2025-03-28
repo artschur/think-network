@@ -1,8 +1,8 @@
 'use server';
 
-import { randomUUIDv7 } from 'bun';
+import { randomUUID } from 'crypto';
 import { UploadImageTemporary } from './interfaces';
-import { supabase } from './posts';
+import { supabase } from './db';
 import { db } from './db';
 import { imagesTable } from './db/schema';
 
@@ -11,14 +11,15 @@ export async function uploadPostImages({
   images,
 }: {
   postId: number;
-  images: Base64URLString[];
+  images: File[];
 }): Promise<{ publicUrls: string[] }> {
   const imagesToInsert: UploadImageTemporary[] = [];
-
+  if (!images || !images.length) {
+    throw new Error('No images provided');
+  }
   for (const image of images) {
-    const imageName = randomUUIDv7();
+    const imageName = randomUUID();
     const imagePath = `posts/${postId}/${imageName}`;
-
     const { error } = await supabase.storage
       .from('media')
       .upload(imagePath, image, {
