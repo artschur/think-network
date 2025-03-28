@@ -122,36 +122,39 @@ export async function createPost({
 }) {
   const { userId } = await auth();
   if (!userId) throw new Error('You need to be authenticaded to post.');
+  try {
+    const { id } = (
+      await db
+        .insert(postsTable)
+        .values({
+          userId: userId,
+          content: postContent.content,
+          isComment: false,
+        })
+        .returning({
+          id: postsTable.id,
+        })
+    )[0];
 
-  const { id } = (
-    await db
-      .insert(postsTable)
-      .values({
-        userId: userId,
-        content: postContent.content,
-        isComment: false,
-      })
-      .returning({
-        id: postsTable.id,
-      })
-  )[0];
+    if (!id) throw new Error('Error creating post');
 
-  if (!id) throw new Error('Error creating post');
-
-  if (postContent.imagesUrl && postContent.imagesUrl.length > 0) {
-    const publicUrls = await uploadPostImages({
-      postId: id,
-      images: postContent.imagesUrl,
-    });
+    if (postContent.images && postContent.images.length > 0) {
+      const publicUrls = await uploadPostImages({
+        postId: id,
+        images: postContent.images,
+      });
+      return {
+        postId: id,
+        publicUrls: publicUrls?.publicUrls,
+      };
+    }
     return {
       postId: id,
-      publicUrls: publicUrls?.publicUrls,
     };
+  } catch (error) {
+    console.error('Error creating post:', error);
+    throw new Error('Error creating post');
   }
-
-  return {
-    postId: id,
-  };
 }
 
 export async function getTopPosts() {

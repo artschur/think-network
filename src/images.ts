@@ -4,21 +4,22 @@ import { randomUUID } from 'crypto';
 import { UploadImageTemporary } from './interfaces';
 import { supabase } from './db';
 import { db } from './db';
-import { imagesTable } from './db/schema';
+import { imagesTable, mediaBucket } from './db/schema';
 
 export async function uploadPostImages({
   postId,
   images,
 }: {
   postId: number;
-  images: Base64URLString[];
+  images: File[];
 }): Promise<{ publicUrls: string[] }> {
   const imagesToInsert: UploadImageTemporary[] = [];
-
+  if (!images || !images.length) {
+    throw new Error('No images provided');
+  }
   for (const image of images) {
     const imageName = randomUUID();
     const imagePath = `posts/${postId}/${imageName}`;
-
     const { error } = await supabase.storage
       .from('media')
       .upload(imagePath, image, {

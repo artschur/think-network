@@ -1,7 +1,7 @@
 export interface CreatePostInterface {
   userId: string;
   content: string;
-  imagesUrl?: Base64URLString[];
+  images?: File[];
 }
 
 export interface UploadImageTemporary {
