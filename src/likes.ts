@@ -1,8 +1,8 @@
 'use server';
 
 import { db } from './db';
-import { likesTable } from './db/schema';
-import { and, eq } from 'drizzle-orm';
+import { likesTable, postsTable } from './db/schema';
+import { and, eq, sql } from 'drizzle-orm';
 
 export async function likePost({
   userId,
@@ -16,7 +16,16 @@ export async function likePost({
   }
 
   try {
-    await db.insert(likesTable).values({ userId, postId });
+    await db.transaction(async (tx) => {
+      // Inserir o like
+      await tx.insert(likesTable).values({ userId, postId });
+
+      // Incrementar o likeCount
+      await tx
+        .update(postsTable)
+        .set({ likeCount: sql`${postsTable.likeCount} + 1` })
+        .where(eq(postsTable.id, postId));
+    });
 
     return { success: true, message: 'Post liked successfully' };
   } catch (error) {
@@ -37,14 +46,23 @@ export async function unlikePost({
   }
 
   try {
-    const result = await db
-      .delete(likesTable)
-      .where(and(eq(likesTable.userId, userId), eq(likesTable.postId, postId)))
-      .returning({ deletedId: likesTable.id });
+    await db.transaction(async (tx) => {
+      // Remover o like
+      const result = await tx
+        .delete(likesTable)
+        .where(and(eq(likesTable.userId, userId), eq(likesTable.postId, postId)))
+        .returning({ deletedId: likesTable.id });
 
-    if (result.length === 0) {
-      throw new Error('Like not found.');
-    }
+      if (result.length === 0) {
+        throw new Error('Like not found.');
+      }
+
+      // Decrementar o likeCount
+      await tx
+        .update(postsTable)
+        .set({ likeCount: sql`${postsTable.likeCount} - 1` })
+        .where(eq(postsTable.id, postId));
+    });
 
     return { success: true, message: 'Post unliked successfully' };
   } catch (error) {
