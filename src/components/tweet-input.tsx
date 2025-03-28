@@ -8,7 +8,6 @@ import {
   Smile,
   Calendar,
   Loader2,
-  X,
   ImagePlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

@@ -31,7 +31,7 @@ export default function ImageGrid({
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   if (images.length === 0) return null;
-
+  console.log(images);
   const openPreview = (image: GridImage, index: number) => {
     // Don't open preview for uploading images
     if (!image.uploading) {
@@ -58,7 +58,7 @@ export default function ImageGrid({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;
-      
+
       if (e.key === 'ArrowRight') {
         showNextImage();
       } else if (e.key === 'ArrowLeft') {
@@ -158,12 +158,12 @@ export default function ImageGrid({
                   height={800}
                   className="object-contain max-h-[80vh] rounded-md"
                 />
-                
+
                 <DialogClose className="absolute top-2 right-2 rounded-full p-2 bg-black/50 hover:bg-black/70 text-white">
                   <X className="h-4 w-4" />
                   <span className="sr-only">Close</span>
                 </DialogClose>
-                
+
                 {/* Navigation buttons */}
                 {images.length > 1 && (
                   <>
@@ -182,7 +182,7 @@ export default function ImageGrid({
                       <ChevronLeft className="h-6 w-6" />
                       <span className="sr-only">Previous image</span>
                     </Button>
-                    
+
                     {/* Next button */}
                     <Button
                       type="button"
@@ -198,7 +198,7 @@ export default function ImageGrid({
                       <ChevronRight className="h-6 w-6" />
                       <span className="sr-only">Next image</span>
                     </Button>
-                    
+
                     {/* Image counter */}
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                       {selectedIndex + 1} / {images.length}

@@ -1,9 +1,22 @@
 import type { NextConfig } from 'next';
+/** @type {import('next').NextConfig} */
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
   images: {
-    domains: ['jabsvwgnukmkxuldmwpa.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'jabsvwgnukmkxuldmwpa.supabase.co',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 

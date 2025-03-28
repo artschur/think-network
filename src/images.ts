@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 import { UploadImageTemporary } from './interfaces';
 import { supabase } from './db';
 import { db } from './db';
-import { imagesTable, mediaBucket } from './db/schema';
+import { imagesTable } from './db/schema';
 
 export async function uploadPostImages({
   postId,
