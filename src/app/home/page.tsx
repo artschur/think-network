@@ -35,7 +35,7 @@ export default async function Home() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto flex min-h-screen py-6 gap-6">
         {/* Left sidebar */}
-        <Sidebar />
+        <Sidebar user={user} />
 
         {/* Main content */}
         <main className="flex-1 max-w-xl">

@@ -12,9 +12,10 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserButton } from '@clerk/nextjs';
+import { SimpleUserInfo } from '@/users';
 
-export default function Sidebar() {
+export default function Sidebar({ user }: { user: SimpleUserInfo }) {
   const navItems = [
     { icon: Home, label: 'Home', href: '/' },
     { icon: Search, label: 'Explore', href: '/explore' },
@@ -58,15 +59,12 @@ export default function Sidebar() {
         </Button>
 
         <div className="mt-auto mb-2 flex items-center gap-3 p-3 rounded-md hover:bg-accent transition-all cursor-pointer">
-          <Avatar>
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              U
-            </AvatarFallback>
-            <AvatarImage src="/placeholder.svg?height=40&width=40" />
-          </Avatar>
+          <UserButton />
           <div className="hidden xl:block">
-            <div className="font-medium text-foreground">Username</div>
-            <div className="text-muted-foreground text-sm">@username</div>
+            <div className="font-medium text-foreground">{user.fullName}</div>
+            <div className="text-muted-foreground text-sm">
+              @{user.username}
+            </div>
           </div>
         </div>
       </Card>
