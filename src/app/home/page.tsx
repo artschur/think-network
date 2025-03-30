@@ -1,41 +1,36 @@
-import type React from "react"
+import { Suspense } from 'react';
+import Sidebar from '@/components/sidebar';
+import TweetInput from '@/components/tweet-input';
+import TweetFeed from '@/components/tweet-feed';
+import WhoToFollow from '@/components/who-to-follow';
+import { Card, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Search } from 'lucide-react';
+import { currentUser } from '@clerk/nextjs/server';
+import type { SimpleUserInfo } from '@/users';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getTopPosts, getPostsByFollowing } from '@/posts';
 
-import { Suspense } from "react"
-import Sidebar from "@/components/sidebar"
-import TweetInput from "@/components/tweet-input"
-import TweetFeed from "@/components/tweet-feed"
-import WhoToFollow from "@/components/who-to-follow"
-import { Card, CardHeader } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Search } from "lucide-react"
-import { currentUser } from "@clerk/nextjs/server"
-import type { SimpleUserInfo } from "@/users"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getTopPosts, getPostsByFollowing } from "@/posts"
-import type { TweetWithUser } from "@/interfaces"
+export default async function Home() {
+  // Get the current user
+  const response = await currentUser();
+  if (!response) {
+    throw new Error('User not authenticated');
+  }
 
-export async function FeedData({
-  user,
-  children,
-}: {
-  user: SimpleUserInfo
-  children: (followingTweets: TweetWithUser[], featuredTweets: TweetWithUser[]) => React.ReactNode
-}) {
-  const [followingTweets, featuredTweets] = await Promise.all([getPostsByFollowing({ userId: user.id }), getTopPosts()])
+  const user: SimpleUserInfo = {
+    id: response.id,
+    username: response?.username,
+    fullName: response?.fullName,
+    imageUrl: response?.imageUrl,
+  };
 
-  return <>{children(followingTweets, featuredTweets)}</>
-}
+  const [followingTweets, featuredTweets] = await Promise.all([
+    getPostsByFollowing({ userId: user.id }),
+    getTopPosts(),
+  ]);
 
-function HomeContent({
-  user,
-  followingTweets,
-  featuredTweets,
-}: {
-  user: SimpleUserInfo
-  followingTweets: TweetWithUser[]
-  featuredTweets: TweetWithUser[]
-}) {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto flex min-h-screen py-6 gap-6">
@@ -44,7 +39,6 @@ function HomeContent({
 
         {/* Main content */}
         <main className="flex-1 max-w-xl">
-          {/* Single Tabs component that wraps both the triggers and content */}
           <Tabs defaultValue="for-you">
             <Card className="sticky top-0 z-10 mb-6 border-b">
               <CardHeader className="pb-3">
@@ -62,10 +56,10 @@ function HomeContent({
             <TweetInput user={user} />
 
             <TabsContent value="for-you">
-              <TweetFeed tweets={featuredTweets} />
+              <TweetFeed tweets={featuredTweets} loggedUser={user} />
             </TabsContent>
             <TabsContent value="following">
-              <TweetFeed tweets={followingTweets} />
+              <TweetFeed tweets={followingTweets} loggedUser={user} />
             </TabsContent>
           </Tabs>
         </main>
@@ -75,66 +69,48 @@ function HomeContent({
           {/* Search bar */}
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search" className="pl-9 rounded-full bg-primary" />
+            <Input
+              placeholder="Search"
+              className="pl-9 rounded-full bg-primary"
+            />
           </div>
 
-          <Suspense
-            fallback={
-              <Card className="h-64">
-                <CardHeader>
-                  <Skeleton className="h-6 w-24" />
-                </CardHeader>
-                <div className="p-6 space-y-4">
-                  {Array(3)
-                    .fill(0)
-                    .map((_, i) => (
-                      <div key={i} className="flex justify-between">
-                        <div className="flex gap-3">
-                          <Skeleton className="h-10 w-10 rounded-full" />
-                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-24" />
-                            <Skeleton className="h-4 w-16" />
-                          </div>
-                        </div>
-                        <Skeleton className="h-9 w-16 rounded-full" />
-                      </div>
-                    ))}
-                </div>
-              </Card>
-            }
-          >
+          <Suspense fallback={<WhoToFollowSkeleton />}>
             <WhoToFollow user={user} />
           </Suspense>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default async function Home() {
-  const response = await currentUser()
-  if (!response) {
-    throw new Error("User not authenticated")
-  }
-
-  const userDTO: SimpleUserInfo = {
-    id: response.id,
-    username: response?.username,
-    fullName: response?.fullName,
-    imageUrl: response?.imageUrl,
-  }
-
+function WhoToFollowSkeleton() {
   return (
-    <Suspense fallback={<TweetFeedSkeleton />}>
-      <FeedData user={userDTO}>
-        {(followingTweets, featuredTweets) => (
-          <HomeContent user={userDTO} followingTweets={followingTweets} featuredTweets={featuredTweets} />
-        )}
-      </FeedData>
-    </Suspense>
-  )
+    <Card className="h-64">
+      <CardHeader>
+        <Skeleton className="h-6 w-24" />
+      </CardHeader>
+      <div className="p-6 space-y-4">
+        {Array(3)
+          .fill(0)
+          .map((_, i) => (
+            <div key={i} className="flex justify-between">
+              <div className="flex gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              </div>
+              <Skeleton className="h-9 w-16 rounded-full" />
+            </div>
+          ))}
+      </div>
+    </Card>
+  );
 }
 
+// Keep the TweetFeedSkeleton in case it's used elsewhere
 function TweetFeedSkeleton() {
   return (
     <div className="space-y-6">
@@ -162,6 +138,5 @@ function TweetFeedSkeleton() {
           </Card>
         ))}
     </div>
-  )
+  );
 }
-
