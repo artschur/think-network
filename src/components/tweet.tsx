@@ -4,10 +4,11 @@ import { MessageCircle, Heart, Share } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import ImageGrid, { GridImage } from '@/components/image-grid';
 import { SimpleUserInfo } from '@/users';
+import { checkIfLiked, likePost, unlikePost } from '@/likes';
 
 interface PostResponseWithUser {
   post: {
@@ -34,6 +35,35 @@ export default function Tweet({
   loggedUser: SimpleUserInfo;
 }) {
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(tweet.post.likeCount);
+
+  useEffect(() => {
+    checkIfLiked({ loggedUserId: loggedUser.id, postId: tweet.post.id })
+      .then((isLiked) => setLiked(isLiked))
+      .catch((err) => console.error('Failed to check like status:', err));
+  }, [loggedUser.id, tweet.post.id]);
+
+  const handleLike = () => {
+    const newLikedState = !liked;
+    setLiked(newLikedState);
+    setLikeCount(newLikedState ? likeCount + 1 : likeCount - 1);
+
+    if (newLikedState) {
+      likePost({ loggedUserId: loggedUser.id, postId: tweet.post.id }).catch(
+        () => {
+          setLiked(false);
+          setLikeCount(likeCount);
+        },
+      );
+    } else {
+      unlikePost({ loggedUserId: loggedUser.id, postId: tweet.post.id }).catch(
+        () => {
+          setLiked(true);
+          setLikeCount(likeCount);
+        },
+      );
+    }
+  };
 
   const gridImages: GridImage[] =
     tweet.images?.map((img, index) => ({
@@ -95,15 +125,13 @@ export default function Tweet({
                     ? 'text-destructive hover:text-destructive hover:bg-destructive/10'
                     : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
                 )}
-                onClick={() => setLiked(!liked)}
+                onClick={handleLike}
               >
                 <Heart
                   className="h-4 w-4"
                   fill={liked ? 'currentColor' : 'none'}
                 />
-                <span className="text-xs ml-1">
-                  {liked ? tweet.post.likeCount + 1 : tweet.post.likeCount}
-                </span>
+                <span className="text-xs ml-1">{likeCount}</span>
               </Button>
 
               <Button

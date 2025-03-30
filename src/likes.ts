@@ -5,28 +5,26 @@ import { likesTable, postsTable } from './db/schema';
 import { and, eq, sql } from 'drizzle-orm';
 
 export async function likePost({
-  userId,
+  loggedUserId,
   postId,
 }: {
-  userId: string;
+  loggedUserId: string;
   postId: number;
 }) {
-  if (!userId || !postId) {
-    throw new Error('Both userId and postId are required.');
+  if (!loggedUserId || !postId) {
+    throw new Error('Both loggedUserId and postId are required.');
   }
 
   try {
     await db.transaction(async (tx) => {
-      // Inserir o like
-      await tx.insert(likesTable).values({ userId, postId });
-
-      // Incrementar o likeCount
-      await tx
-        .update(postsTable)
-        .set({ likeCount: sql`${postsTable.likeCount} + 1` })
-        .where(eq(postsTable.id, postId));
+      await Promise.all([
+        tx.insert(likesTable).values({ userId: loggedUserId, postId }),
+        tx
+          .update(postsTable)
+          .set({ likeCount: sql`${postsTable.likeCount} + 1` })
+          .where(eq(postsTable.id, postId)),
+      ]);
     });
-
     return { success: true, message: 'Post liked successfully' };
   } catch (error) {
     console.error('Error liking post:', error);
@@ -35,33 +33,31 @@ export async function likePost({
 }
 
 export async function unlikePost({
-  userId,
+  loggedUserId,
   postId,
 }: {
-  userId: string;
+  loggedUserId: string;
   postId: number;
 }) {
-  if (!userId || !postId) {
-    throw new Error('Both userId and postId are required.');
+  if (!loggedUserId || !postId) {
+    throw new Error('Both loggedUserId and postId are required.');
   }
-
   try {
     await db.transaction(async (tx) => {
-      // Remover o like
-      const result = await tx
-        .delete(likesTable)
-        .where(and(eq(likesTable.userId, userId), eq(likesTable.postId, postId)))
-        .returning({ deletedId: likesTable.id });
-
-      if (result.length === 0) {
-        throw new Error('Like not found.');
-      }
-
-      // Decrementar o likeCount
-      await tx
-        .update(postsTable)
-        .set({ likeCount: sql`${postsTable.likeCount} - 1` })
-        .where(eq(postsTable.id, postId));
+      await Promise.all([
+        tx
+          .delete(likesTable)
+          .where(
+            and(
+              eq(likesTable.userId, loggedUserId),
+              eq(likesTable.postId, postId),
+            ),
+          ),
+        tx
+          .update(postsTable)
+          .set({ likeCount: sql`${postsTable.likeCount} - 1` })
+          .where(eq(postsTable.id, postId)),
+      ]);
     });
 
     return { success: true, message: 'Post unliked successfully' };
@@ -72,13 +68,13 @@ export async function unlikePost({
 }
 
 export async function checkIfLiked({
-  userId,
+  loggedUserId,
   postId,
 }: {
-  userId: string;
+  loggedUserId: string;
   postId: number;
 }): Promise<boolean> {
-  if (!userId || !postId) {
+  if (!loggedUserId || !postId) {
     return false;
   }
 
@@ -86,7 +82,9 @@ export async function checkIfLiked({
     const result = await db
       .select({ id: likesTable.id })
       .from(likesTable)
-      .where(and(eq(likesTable.userId, userId), eq(likesTable.postId, postId)))
+      .where(
+        and(eq(likesTable.userId, loggedUserId), eq(likesTable.postId, postId)),
+      )
       .limit(1);
 
     return result.length > 0;
