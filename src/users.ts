@@ -13,50 +13,62 @@ export interface SimpleUserInfo {
 }
 
 export async function getRecommendedUsers({ userId }: { userId: string }) {
+  // First get who the user follows
   const getPeopleUserFollows = await db
     .select({ following: followersTable.followingId })
     .from(followersTable)
     .where(eq(followersTable.userId, userId))
-    .limit(5);
+    .limit(20);
 
   const followingIds: string[] = getPeopleUserFollows.map(
     (follower) => follower.following,
   );
 
-  let recommendedUsers;
+  // Execute these two queries concurrently
+  const [secondDegreeConnections, getFollowersThatUserDoesNotFollow] =
+    await Promise.all([
+      // Query 1: Get people that the users I follow are following (second-degree connections)
+      // People that my friends follow but I don't follow yet
+      followingIds.length > 0
+        ? db
+            .select({ userId: followersTable.followingId })
+            .from(followersTable)
+            .where(
+              and(
+                inArray(followersTable.userId, followingIds),
+                not(eq(followersTable.followingId, userId)), // Don't recommend myself
+                not(inArray(followersTable.followingId, followingIds)), // Don't recommend people I already follow
+              ),
+            )
+            .groupBy(followersTable.followingId)
+            .orderBy(desc(count(followersTable.followingId))) // Rank by popularity among my friends
+            .limit(10)
+        : db
+            .select({ userId: followersTable.followingId })
+            .from(followersTable)
+            .groupBy(followersTable.followingId)
+            .orderBy(desc(count(followersTable.followingId)))
+            .limit(10),
 
-  if (followingIds.length > 0) {
-    recommendedUsers = await db
-      .select({ userId: followersTable.followingId })
-      .from(followersTable)
-      .where(inArray(followersTable.userId, followingIds))
-      .limit(10);
-  } else {
-    recommendedUsers = await db
-      .select({ userId: followersTable.followingId })
-      .from(followersTable)
-      .groupBy(followersTable.followingId)
-      .orderBy(desc(count(followersTable.followingId)))
-      .limit(10);
-  }
-
-  const getFollowersThatUserDoesNotFollow = await db
-    .select({ userId: followersTable.userId })
-    .from(followersTable)
-    .where(
-      and(
-        eq(followersTable.followingId, userId),
-        not(inArray(followersTable.userId, followingIds))
-      )
-    )
-    .limit(5);
+      // Query 2: Get followers that the user doesn't follow back (unchanged)
+      db
+        .select({ userId: followersTable.userId })
+        .from(followersTable)
+        .where(
+          and(
+            eq(followersTable.followingId, userId),
+            not(inArray(followersTable.userId, followingIds)),
+          ),
+        )
+        .limit(5),
+    ]);
 
   const allRecommendedUserIds = [
     ...new Set([
-      ...recommendedUsers.map((user) => user.userId),
-      ...getFollowersThatUserDoesNotFollow.map((user) => user.userId),
+      ...secondDegreeConnections.map((user) => `+${user.userId}`),
+      ...getFollowersThatUserDoesNotFollow.map((user) => `+${user.userId}`),
     ]),
-  ].filter((id) => id !== userId);
+  ].filter((id) => id !== `+${userId}`);
 
   if (allRecommendedUserIds.length === 0) {
     return [];
