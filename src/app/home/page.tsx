@@ -56,10 +56,14 @@ export default async function Home() {
             <TweetInput user={user} />
 
             <TabsContent value="for-you">
-              <TweetFeed tweets={featuredTweets} loggedUser={user} />
+              <Suspense fallback={TweetFeedSkeleton()}>
+                <TweetFeed tweets={featuredTweets} loggedUser={user} />
+              </Suspense>
             </TabsContent>
             <TabsContent value="following">
-              <TweetFeed tweets={followingTweets} loggedUser={user} />
+              <Suspense fallback={TweetFeedSkeleton()}>
+                <TweetFeed tweets={followingTweets} loggedUser={user} />
+              </Suspense>
             </TabsContent>
           </Tabs>
         </main>
@@ -110,7 +114,6 @@ function WhoToFollowSkeleton() {
   );
 }
 
-// Keep the TweetFeedSkeleton in case it's used elsewhere
 function TweetFeedSkeleton() {
   return (
     <div className="space-y-6">
