@@ -13,7 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getTopPosts, getPostsByFollowing } from '@/posts';
 
 export default async function Home() {
-  // Get the current user
   const response = await currentUser();
   if (!response) {
     throw new Error('User not authenticated');
@@ -25,11 +24,6 @@ export default async function Home() {
     fullName: response?.fullName,
     imageUrl: response?.imageUrl,
   };
-
-  const [followingTweets, featuredTweets] = await Promise.all([
-    getPostsByFollowing({ userId: user.id }),
-    getTopPosts(),
-  ]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,13 +50,13 @@ export default async function Home() {
             <TweetInput user={user} />
 
             <TabsContent value="for-you">
-              <Suspense fallback={TweetFeedSkeleton()}>
-                <TweetFeed tweets={featuredTweets} loggedUser={user} />
+              <Suspense fallback={<TweetFeedSkeleton />}>
+                <FeaturedFeed loggedUser={user} />
               </Suspense>
             </TabsContent>
             <TabsContent value="following">
-              <Suspense fallback={TweetFeedSkeleton()}>
-                <TweetFeed tweets={followingTweets} loggedUser={user} />
+              <Suspense fallback={<TweetFeedSkeleton />}>
+                <FollowingFeed loggedUser={user} />
               </Suspense>
             </TabsContent>
           </Tabs>
@@ -88,6 +82,16 @@ export default async function Home() {
   );
 }
 
+// Create these new components
+async function FeaturedFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
+  const tweets = await getTopPosts();
+  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
+}
+
+async function FollowingFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
+  const tweets = await getPostsByFollowing({ userId: loggedUser.id });
+  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
+}
 function WhoToFollowSkeleton() {
   return (
     <Card className="h-64">
