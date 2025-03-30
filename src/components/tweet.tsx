@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import ImageGrid, { GridImage } from '@/components/image-grid';
+import { SimpleUserInfo } from '@/users';
 
 interface PostResponseWithUser {
   post: {
@@ -25,7 +26,13 @@ interface PostResponseWithUser {
   images?: { publicUrl: string }[];
 }
 
-export default function Tweet({ tweet }: { tweet: PostResponseWithUser }) {
+export default function Tweet({
+  tweet,
+  loggedUser,
+}: {
+  tweet: PostResponseWithUser;
+  loggedUser: SimpleUserInfo;
+}) {
   const [liked, setLiked] = useState(false);
 
   const gridImages: GridImage[] =
