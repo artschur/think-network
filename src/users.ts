@@ -13,7 +13,6 @@ export interface SimpleUserInfo {
 }
 
 export async function getRecommendedUsers({ userId }: { userId: string }) {
-  // First get who the user follows
   const getPeopleUserFollows = await db
     .select({ following: followersTable.followingId })
     .from(followersTable)
@@ -24,11 +23,9 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
     (follower) => follower.following,
   );
 
-  // Execute these two queries concurrently
   const [secondDegreeConnections, getFollowersThatUserDoesNotFollow] =
     await Promise.all([
-      // Query 1: Get people that the users I follow are following (second-degree connections)
-      // People that my friends follow but I don't follow yet
+
       followingIds.length > 0
         ? db
             .select({ userId: followersTable.followingId })
@@ -36,12 +33,12 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
             .where(
               and(
                 inArray(followersTable.userId, followingIds),
-                not(eq(followersTable.followingId, userId)), // Don't recommend myself
-                not(inArray(followersTable.followingId, followingIds)), // Don't recommend people I already follow
+                not(eq(followersTable.followingId, userId)),
+                not(inArray(followersTable.followingId, followingIds)),
               ),
             )
             .groupBy(followersTable.followingId)
-            .orderBy(desc(count(followersTable.followingId))) // Rank by popularity among my friends
+            .orderBy(desc(count(followersTable.followingId)))
             .limit(10)
         : db
             .select({ userId: followersTable.followingId })
@@ -50,7 +47,6 @@ export async function getRecommendedUsers({ userId }: { userId: string }) {
             .orderBy(desc(count(followersTable.followingId)))
             .limit(10),
 
-      // Query 2: Get followers that the user doesn't follow back (unchanged)
       db
         .select({ userId: followersTable.userId })
         .from(followersTable)

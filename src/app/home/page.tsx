@@ -28,14 +28,13 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto flex min-h-screen py-6 gap-6">
-        {/* Left sidebar */}
         <Sidebar user={user} />
 
-        {/* Main content */}
         <main className="flex-1 max-w-xl">
           <Tabs defaultValue="for-you">
             <Card className="sticky top-0 z-10 mb-6 border-b">
               <CardHeader className="pb-3">
+
                 <TabsList className="w-full">
                   <TabsTrigger value="for-you" className="flex-1">
                     For You
@@ -44,6 +43,7 @@ export default async function Home() {
                     Following
                   </TabsTrigger>
                 </TabsList>
+
               </CardHeader>
             </Card>
 
@@ -54,6 +54,7 @@ export default async function Home() {
                 <FeaturedFeed loggedUser={user} />
               </Suspense>
             </TabsContent>
+
             <TabsContent value="following">
               <Suspense fallback={<TweetFeedSkeleton />}>
                 <FollowingFeed loggedUser={user} />
@@ -62,9 +63,8 @@ export default async function Home() {
           </Tabs>
         </main>
 
-        {/* Right sidebar */}
         <div className="hidden lg:flex flex-col w-80 space-y-6 sticky top-6 h-[calc(100vh-3rem)]">
-          {/* Search bar */}
+          
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -82,7 +82,6 @@ export default async function Home() {
   );
 }
 
-// Create these new components
 async function FeaturedFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
   const tweets = await getTopPosts();
   return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
@@ -98,6 +97,7 @@ function WhoToFollowSkeleton() {
       <CardHeader>
         <Skeleton className="h-6 w-24" />
       </CardHeader>
+
       <div className="p-6 space-y-4">
         {Array(3)
           .fill(0)
@@ -113,6 +113,7 @@ function WhoToFollowSkeleton() {
               <Skeleton className="h-9 w-16 rounded-full" />
             </div>
           ))}
+          
       </div>
     </Card>
   );

@@ -33,7 +33,7 @@ export default function ImageGrid({
   if (images.length === 0) return null;
   console.log(images);
   const openPreview = (image: GridImage, index: number) => {
-    // Don't open preview for uploading images
+    
     if (!image.uploading) {
       setSelectedImage(image);
       setSelectedIndex(index);
@@ -54,7 +54,7 @@ export default function ImageGrid({
     }
   };
 
-  // Add keyboard navigation
+  
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;
@@ -91,12 +91,8 @@ export default function ImageGrid({
             key={image.id}
             className={cn(
               'relative group bg-muted cursor-pointer',
-              // For 3 images:
-              // - First image takes full height on the left
-              // - Second and third images stacked on the right
               images.length === 3 && index === 0 && 'row-span-2',
               images.length === 3 && index !== 0 && 'h-full',
-              // Default aspect ratio for other layouts
               images.length !== 3 && 'aspect-square',
             )}
             onClick={() => openPreview(image, index)}
@@ -108,7 +104,6 @@ export default function ImageGrid({
               className="object-cover"
             />
 
-            {/* Upload progress overlay */}
             {image.uploading && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full bg-black/70 flex items-center justify-center text-white text-sm font-medium">
@@ -117,7 +112,6 @@ export default function ImageGrid({
               </div>
             )}
 
-            {/* Remove button */}
             {editable && onRemove && (
               <Button
                 type="button"
@@ -137,7 +131,6 @@ export default function ImageGrid({
         ))}
       </div>
 
-      {/* Image Preview Modal */}
       <Dialog
         open={!!selectedImage}
         onOpenChange={(open: boolean) => {
@@ -164,10 +157,8 @@ export default function ImageGrid({
                   <span className="sr-only">Close</span>
                 </DialogClose>
 
-                {/* Navigation buttons */}
                 {images.length > 1 && (
                   <>
-                    {/* Previous button */}
                     <Button
                       type="button"
                       size="icon"
@@ -183,7 +174,6 @@ export default function ImageGrid({
                       <span className="sr-only">Previous image</span>
                     </Button>
 
-                    {/* Next button */}
                     <Button
                       type="button"
                       size="icon"
@@ -199,7 +189,6 @@ export default function ImageGrid({
                       <span className="sr-only">Next image</span>
                     </Button>
 
-                    {/* Image counter */}
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                       {selectedIndex + 1} / {images.length}
                     </div>
