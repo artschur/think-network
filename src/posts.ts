@@ -199,7 +199,7 @@ export async function getTopPosts() {
   });
 }
 
-export async function getPostsLikedByUser({
+export async function getLikedPostsByUser({
   userId,
 }: {
   userId: string;
