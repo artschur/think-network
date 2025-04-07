@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import ImageGrid, { GridImage } from '@/components/image-grid';
-import { SimpleUserInfo } from '@/users';
+import ImageGrid, { type GridImage } from '@/components/image-grid';
+import type { SimpleUserInfo } from '@/users';
 import { checkIfLiked, likePost, unlikePost } from '@/likes';
+import { toast } from 'sonner';
 
 interface PostResponseWithUser {
   post: {
@@ -62,6 +63,24 @@ export default function Tweet({
           setLikeCount(likeCount);
         },
       );
+    }
+  };
+
+  const handleShare = async () => {
+    const postUrl = `http://localhost:3000/posts/${tweet.post.id}`;
+
+    try {
+      await navigator.clipboard.writeText(postUrl);
+      toast('Link copied to clipboard', {
+        description: 'You can now share this post with others',
+        icon: <Share className="h-4 w-4" />,
+      });
+    } catch (err) {
+      toast('Failed to copy link', {
+        description: 'Please try again',
+        icon: <Share className="h-4 w-4" />,
+      });
+      console.error('Failed to copy link:', err);
     }
   };
 
@@ -137,7 +156,8 @@ export default function Tweet({
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10  cursor-pointer"
+                className="rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
+                onClick={handleShare}
               >
                 <Share className="h-4 w-4" />
               </Button>
