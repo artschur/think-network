@@ -36,10 +36,10 @@ export default async function Home() {
               <CardHeader className="pb-3">
 
                 <TabsList className="w-full">
-                  <TabsTrigger value="for-you" className="flex-1">
+                  <TabsTrigger value="for-you" className="flex-1 cursor-pointer">
                     For You
                   </TabsTrigger>
-                  <TabsTrigger value="following" className="flex-1">
+                  <TabsTrigger value="following" className="flex-1 cursor-pointer">
                     Following
                   </TabsTrigger>
                 </TabsList>
