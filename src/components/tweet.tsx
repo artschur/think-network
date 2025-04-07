@@ -110,7 +110,7 @@ export default function Tweet({
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                className="rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
               >
                 <MessageCircle className="h-4 w-4" />
                 <span className="text-xs ml-1">{tweet.post.commentCount}</span>
@@ -120,7 +120,7 @@ export default function Tweet({
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  'rounded-full flex items-center gap-1',
+                  'rounded-full flex items-center gap-1 cursor-pointer',
                   liked
                     ? 'text-destructive hover:text-destructive hover:bg-destructive/10'
                     : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
@@ -137,7 +137,7 @@ export default function Tweet({
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10"
+                className="rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10  cursor-pointer"
               >
                 <Share className="h-4 w-4" />
               </Button>
