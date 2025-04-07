@@ -4,11 +4,11 @@ import {
   Search,
   Bell,
   Mail,
-  Bookmark,
   User,
   MoreHorizontal,
   PlusCircle,
   Brain,
+  Heart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -18,11 +18,11 @@ import { Suspense } from 'react';
 
 export default function Sidebar({ user }: { user: SimpleUserInfo }) {
   const navItems = [
-    { icon: Home, label: 'Home', href: '/' },
+    { icon: Home, label: 'Home', href: '/home' },
     { icon: Search, label: 'Explore', href: '/explore' },
     { icon: Bell, label: 'Notifications', href: '/notifications' },
     { icon: Mail, label: 'Messages', href: '/messages' },
-    { icon: Bookmark, label: 'Bookmarks', href: '/bookmarks' },
+    { icon: Heart, label: 'Likes', href: '/likes' },
     { icon: User, label: 'Profile', href: '/profile' },
     { icon: MoreHorizontal, label: 'More', href: '#' },
   ];
