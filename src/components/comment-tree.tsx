@@ -3,10 +3,11 @@
 import { formatDistanceToNow } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Heart, MessageCircle, MoreHorizontal } from "lucide-react"
+import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,10 +15,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+import { checkIfLiked, likePost, unlikePost } from "@/likes"
 import CommentInput from "@/components/comment-input"
 import type { SimpleUserInfo } from "@/users"
 import type { CommentWithReplies } from "@/comments"
-import { useState } from "react"
 
 interface CommentTreeProps {
   comment: CommentWithReplies
@@ -27,17 +30,68 @@ interface CommentTreeProps {
 
 export default function CommentTree({ comment, loggedUser, isTopLevel = false }: CommentTreeProps) {
   const [showReplyInput, setShowReplyInput] = useState(false)
+  const [liked, setLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(comment.post.likeCount)
   const { post, images, user, replies } = comment
-  const formattedDate = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })
+
+  const createdAt = typeof post.createdAt === "string" ? new Date(post.createdAt) : post.createdAt
+  const formattedDate = formatDistanceToNow(createdAt, { addSuffix: true })
+  const formattedDateTime = `${createdAt.toLocaleDateString()} at ${createdAt.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`
+
+  useEffect(() => {
+    checkIfLiked({ loggedUserId: loggedUser.id, postId: post.id })
+      .then((isLiked) => setLiked(isLiked))
+      .catch((err) => console.error("Failed to check like status:", err))
+  }, [loggedUser.id, post.id])
+
+  const handleLike = () => {
+    const newLikedState = !liked
+    setLiked(newLikedState)
+    setLikeCount(newLikedState ? likeCount + 1 : likeCount - 1)
+
+    if (newLikedState) {
+      likePost({ loggedUserId: loggedUser.id, postId: post.id }).catch(() => {
+        setLiked(false)
+        setLikeCount(likeCount)
+      })
+    } else {
+      unlikePost({ loggedUserId: loggedUser.id, postId: post.id }).catch(() => {
+        setLiked(true)
+        setLikeCount(likeCount)
+      })
+    }
+  }
+
+  const handleShare = async () => {
+    const commentUrl = `http://localhost:3000/post/${post.id}`
+
+    try {
+      await navigator.clipboard.writeText(commentUrl)
+      toast("Link copied to clipboard", {
+        description: "You can now share this comment with others",
+        icon: <Share2 className="h-4 w-4" />,
+      })
+    } catch (err) {
+      toast("Failed to copy link", {
+        description: "Please try again",
+        icon: <Share2 className="h-4 w-4" />,
+      })
+      console.error("Failed to copy link:", err)
+    }
+  }
 
   return (
     <Card
+      id={`comment-${post.id}`}
       className={`overflow-hidden ${isTopLevel ? "" : "ml-6 mt-3 border-l-4 border-l-gray-100 dark:border-l-gray-800"}`}
     >
       <CardContent className="p-4">
         <div className="flex gap-3">
           <Link href={`/profile/${user.username}`}>
-            <Avatar className="h-10 w-10">
+            <Avatar className="h-10 w-10 cursor-pointer">
               <AvatarImage src={user.profileImageUrl} alt={user.fullName} />
               <AvatarFallback>{user.fullName.charAt(0)}</AvatarFallback>
             </Avatar>
@@ -46,26 +100,39 @@ export default function CommentTree({ comment, loggedUser, isTopLevel = false }:
           <div className="flex-1">
             <div className="flex items-center justify-between">
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <Link href={`/profile/${user.username}`} className="font-semibold hover:underline">
+                <Link
+                  href={`/profile/${user.username}`}
+                  className="font-semibold hover:underline hover:text-primary transition-colors"
+                >
                   {user.fullName}
                 </Link>
-                <span className="text-muted-foreground text-sm">
-                  @{user.username} · {formattedDate}
-                </span>
+                <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                  <span>@{user.username}</span>
+                  <span>·</span>
+                  <span className="hover:text-primary transition-colors cursor-pointer" title={formattedDateTime}>
+                    {formattedDate}
+                  </span>
+                </div>
               </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8 hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
                     <MoreHorizontal className="h-4 w-4" />
                     <span className="sr-only">More options</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Copy link</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={handleShare}>
+                    Copy link
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {user.id === loggedUser.id && (
-                    <DropdownMenuItem className="text-red-500">Delete comment</DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-500 cursor-pointer">Delete comment</DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -97,16 +164,36 @@ export default function CommentTree({ comment, loggedUser, isTopLevel = false }:
         <Button
           variant="ghost"
           size="sm"
-          className="flex gap-1 text-xs text-muted-foreground"
+          className="flex gap-1 text-xs rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
           onClick={() => setShowReplyInput(!showReplyInput)}
         >
           <MessageCircle className="h-3.5 w-3.5" />
           <span>{post.commentCount}</span>
         </Button>
 
-        <Button variant="ghost" size="sm" className="flex gap-1 text-xs text-muted-foreground">
-          <Heart className="h-3.5 w-3.5" />
-          <span>{post.likeCount}</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "flex gap-1 text-xs rounded-full cursor-pointer",
+            liked
+              ? "text-destructive hover:text-destructive hover:bg-destructive/10"
+              : "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
+          )}
+          onClick={handleLike}
+        >
+          <Heart className="h-3.5 w-3.5" fill={liked ? "currentColor" : "none"} />
+          <span>{likeCount}</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex gap-1 text-xs rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
+          onClick={handleShare}
+        >
+          <Share2 className="h-3.5 w-3.5" />
+          <span>Share</span>
         </Button>
       </CardFooter>
 

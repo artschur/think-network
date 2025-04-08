@@ -257,7 +257,7 @@ export async function getPostById({
     })
     .from(postsTable)
     .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
-    .where(and(eq(postsTable.id, postId), eq(postsTable.isComment, false)))
+    .where(and(eq(postsTable.id, postId)))
     .groupBy(postsTable.id);
 
   if (postWithImages.length === 0) {
