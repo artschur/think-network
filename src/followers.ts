@@ -60,3 +60,28 @@ export async function unfollowUser({
     throw new Error('Error unfollowing user');
   }
 }
+
+export async function checkIfFollowing({
+  userId,
+  followingId,
+}: {
+  userId: string
+  followingId: string
+}): Promise<boolean> {
+  if (!userId || !followingId) {
+    return false
+  }
+
+  try {
+    const result = await db
+      .select({ id: followersTable.id })
+      .from(followersTable)
+      .where(and(eq(followersTable.userId, userId), eq(followersTable.followingId, followingId)))
+      .limit(1)
+
+    return result.length > 0
+  } catch (error) {
+    console.error("Error checking follow status:", error)
+    return false
+  }
+}

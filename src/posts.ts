@@ -7,6 +7,7 @@ import {
   imagesTable,
   PostSelect,
   postsTable,
+  likesTable,
 } from './db/schema';
 import { auth } from '@clerk/nextjs/server';
 import { CreatePostInterface } from './interfaces';
@@ -196,4 +197,84 @@ export async function getTopPosts() {
       },
     };
   });
+}
+
+export async function getLikedPostsByUser({
+  userId,
+}: {
+  userId: string;
+}): Promise<PostResponseWithUser[]> {
+  if (!userId) throw new Error('User ID is required');
+
+  const postsWithImages = await db
+    .select({
+      posts: postsTable,
+      images: sql<{ id: number; publicUrl: string }[]>`COALESCE(
+        json_agg(json_build_object('id', ${imagesTable.id}, 'publicUrl', ${imagesTable.publicUrl})) FILTER (WHERE ${imagesTable.id} IS NOT NULL),
+        '[]'::json
+      )`.as('images'),
+    })
+    .from(likesTable)
+    .innerJoin(postsTable, eq(likesTable.postId, postsTable.id))
+    .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
+    .where(eq(likesTable.userId, userId))
+    .groupBy(postsTable.id)
+    .orderBy(sql`${postsTable.createdAt} DESC`);
+
+  const userIds = [
+    ...new Set(postsWithImages.map((entry) => entry.posts.userId)),
+  ];
+  const users = (await clerkClient.users.getUserList({ userId: userIds })).data;
+
+  return postsWithImages.map((entry) => {
+    const user = users.find((u) => u.id === entry.posts.userId);
+    if (!user) throw new Error('User not found');
+    return {
+      post: entry.posts,
+      images: entry.images || [],
+      user: {
+        id: user.id,
+        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        username: user.username || '',
+        profileImageUrl: user.imageUrl || '',
+      },
+    };
+  });
+}
+
+export async function getPostById({
+  postId,
+}: {
+  postId: number;
+}): Promise<PostResponseWithUser> {
+  const postWithImages = await db
+    .select({
+      posts: postsTable,
+      images: sql<{ id: number; publicUrl: string }[]>`COALESCE(
+        json_agg(json_build_object('id', ${imagesTable.id}, 'publicUrl', ${imagesTable.publicUrl})) FILTER (WHERE ${imagesTable.id} IS NOT NULL),
+        '[]'::json
+      )`.as('images'),
+    })
+    .from(postsTable)
+    .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
+    .where(and(eq(postsTable.id, postId)))
+    .groupBy(postsTable.id);
+
+  if (postWithImages.length === 0) {
+    throw new Error('Post not found');
+  }
+
+  const postData = postWithImages[0];
+  const user = await clerkClient.users.getUser(postData.posts.userId);
+
+  return {
+    post: postData.posts,
+    images: postData.images || [],
+    user: {
+      id: user.id,
+      fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      username: user.username || '',
+      profileImageUrl: user.imageUrl || '',
+    },
+  };
 }

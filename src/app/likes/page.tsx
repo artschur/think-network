@@ -1,21 +1,19 @@
-import { Suspense } from 'react';
-import Sidebar from '@/components/sidebar';
-import TweetInput from '@/components/tweet-input';
-import TweetFeed from '@/components/tweet-feed';
-import WhoToFollow from '@/components/who-to-follow';
-import { Card, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Search } from 'lucide-react';
-import { currentUser } from '@clerk/nextjs/server';
-import type { SimpleUserInfo } from '@/users';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTopPosts, getPostsByFollowing } from '@/posts';
+import { Suspense } from "react"
+import Sidebar from "@/components/sidebar"
+import TweetFeed from "@/components/tweet-feed"
+import WhoToFollow from "@/components/who-to-follow"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Search, Heart } from "lucide-react"
+import { currentUser } from "@clerk/nextjs/server"
+import type { SimpleUserInfo } from "@/users"
+import { getLikedPostsByUser } from "@/posts"
 
-export default async function Home() {
-  const response = await currentUser();
+export default async function LikesPage() {
+  const response = await currentUser()
   if (!response) {
-    throw new Error('User not authenticated');
+    throw new Error("User not authenticated")
   }
 
   const user: SimpleUserInfo = {
@@ -23,7 +21,7 @@ export default async function Home() {
     username: response?.username,
     fullName: response?.fullName,
     imageUrl: response?.imageUrl,
-  };
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,46 +29,22 @@ export default async function Home() {
         <Sidebar user={user} />
 
         <main className="flex-1 max-w-xl">
-          <Tabs defaultValue="for-you">
-            <Card className="sticky top-0 z-10 mb-6 border-b">
-              <CardHeader className="pb-3">
+          <Card className="sticky top-0 z-10 mb-6 border-b">
+            <CardHeader className="flex flex-row items-center">
+              <Heart className="h-5 w-5 text-rose-500 mr-2" />
+              <CardTitle>Liked Posts</CardTitle>
+            </CardHeader>
+          </Card>
 
-                <TabsList className="w-full">
-                  <TabsTrigger value="for-you" className="flex-1 cursor-pointer">
-                    For You
-                  </TabsTrigger>
-                  <TabsTrigger value="following" className="flex-1 cursor-pointer">
-                    Following
-                  </TabsTrigger>
-                </TabsList>
-
-              </CardHeader>
-            </Card>
-
-            <TweetInput user={user} />
-
-            <TabsContent value="for-you">
-              <Suspense fallback={<TweetFeedSkeleton />}>
-                <FeaturedFeed loggedUser={user} />
-              </Suspense>
-            </TabsContent>
-
-            <TabsContent value="following">
-              <Suspense fallback={<TweetFeedSkeleton />}>
-                <FollowingFeed loggedUser={user} />
-              </Suspense>
-            </TabsContent>
-          </Tabs>
+          <Suspense fallback={<TweetFeedSkeleton />}>
+            <LikedFeed loggedUser={user} />
+          </Suspense>
         </main>
 
         <div className="hidden lg:flex flex-col w-80 space-y-6 sticky top-6 h-[calc(100vh-3rem)]">
-          
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search"
-              className="pl-9 rounded-full bg-primary"
-            />
+            <Input placeholder="Search" className="pl-9 rounded-full bg-primary" />
           </div>
 
           <Suspense fallback={<WhoToFollowSkeleton />}>
@@ -79,18 +53,14 @@ export default async function Home() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-async function FeaturedFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
-  const tweets = await getTopPosts();
-  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
+async function LikedFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
+  const tweets = await getLikedPostsByUser({ userId: loggedUser.id })
+  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />
 }
 
-async function FollowingFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
-  const tweets = await getPostsByFollowing({ userId: loggedUser.id });
-  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
-}
 function WhoToFollowSkeleton() {
   return (
     <Card className="h-64">
@@ -113,10 +83,9 @@ function WhoToFollowSkeleton() {
               <Skeleton className="h-9 w-16 rounded-full" />
             </div>
           ))}
-          
       </div>
     </Card>
-  );
+  )
 }
 
 function TweetFeedSkeleton() {
@@ -146,5 +115,5 @@ function TweetFeedSkeleton() {
           </Card>
         ))}
     </div>
-  );
+  )
 }

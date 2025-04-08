@@ -46,7 +46,6 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Auto-resize textarea as content grows
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -80,12 +79,10 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
 
     setImages((prev) => [...prev, ...newImages]);
 
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
 
-    // Simulate upload progress for each image
     newImages.forEach((image) => {
       simulateImageUpload(image.id);
     });
@@ -123,7 +120,6 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
     setImages((prev) => {
       const updatedImages = prev.filter((img) => img.id !== imageId);
 
-      // Release object URL to prevent memory leaks
       const imageToRemove = prev.find((img) => img.id === imageId);
       if (imageToRemove) {
         URL.revokeObjectURL(imageToRemove.previewUrl);
@@ -161,7 +157,6 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
     }
   };
 
-  // Convert uploading images to GridImage format for the ImageGrid component
   const gridImages = images.map((img) => ({
     id: img.id,
     url: img.previewUrl,
@@ -169,7 +164,6 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
     progress: img.progress,
   }));
 
-  // Clean up object URLs when component unmounts
   useEffect(() => {
     return () => {
       images.forEach((image) => {
@@ -215,7 +209,6 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
                 )}
               />
 
-              {/* Replace image preview grid with the new ImageGrid component */}
               {images.length > 0 && (
                 <ImageGrid
                   images={gridImages}
@@ -324,7 +317,7 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
                 {tweet.length > 0 && (
                   <div className="relative flex items-center justify-center h-7 w-7">
                     <svg className="w-full h-full" viewBox="0 0 24 24">
-                      {/* Background circle */}
+                      
                       <circle
                         className="text-gray-200"
                         cx="12"
@@ -334,7 +327,7 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
                         strokeWidth="2"
                         stroke="currentColor"
                       />
-                      {/* Progress circle */}
+                      
                       <circle
                         className={cn(
                           'transition-all',
@@ -357,7 +350,7 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
                         transform="rotate(-90 12 12)"
                       />
                     </svg>
-                    {/* Text counter in the middle */}
+                    
                     <span
                       className={cn(
                         'absolute text-xs font-medium',

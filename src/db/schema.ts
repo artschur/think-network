@@ -13,7 +13,7 @@ export const postsTable = pgTable(
   {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     userId: varchar({ length: 255 }).notNull(),
-    postReference: integer(), // if its a comment it will have
+    postReference: integer(),
     content: varchar().notNull(),
     isComment: boolean().notNull(),
     likeCount: integer().notNull().default(0),
@@ -61,7 +61,7 @@ export const likesTable = pgTable('likes', {
 
 export const mediaBucket = supabase.storage.createBucket('media', {
   public: true,
-  fileSizeLimit: 1024 * 1024 * 10, // 10MB
+  fileSizeLimit: 1024 * 1024 * 10,
 });
 
 export type PostSelect = typeof postsTable.$inferSelect;
