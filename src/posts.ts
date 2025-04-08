@@ -241,3 +241,40 @@ export async function getLikedPostsByUser({
     };
   });
 }
+
+export async function getPostById({
+  postId,
+}: {
+  postId: number;
+}): Promise<PostResponseWithUser> {
+  const postWithImages = await db
+    .select({
+      posts: postsTable,
+      images: sql<{ id: number; publicUrl: string }[]>`COALESCE(
+        json_agg(json_build_object('id', ${imagesTable.id}, 'publicUrl', ${imagesTable.publicUrl})) FILTER (WHERE ${imagesTable.id} IS NOT NULL),
+        '[]'::json
+      )`.as('images'),
+    })
+    .from(postsTable)
+    .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
+    .where(and(eq(postsTable.id, postId), eq(postsTable.isComment, false)))
+    .groupBy(postsTable.id);
+
+  if (postWithImages.length === 0) {
+    throw new Error('Post not found');
+  }
+
+  const postData = postWithImages[0];
+  const user = await clerkClient.users.getUser(postData.posts.userId);
+
+  return {
+    post: postData.posts,
+    images: postData.images || [],
+    user: {
+      id: user.id,
+      fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      username: user.username || '',
+      profileImageUrl: user.imageUrl || '',
+    },
+  };
+}
