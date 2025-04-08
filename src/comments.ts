@@ -1,33 +1,51 @@
 'use server';
 
-import { db } from './db';
-import { postsTable } from './db/schema';
+import { clerkClient, db } from './db';
+import { imagesTable, postsTable } from './db/schema';
 import { auth } from '@clerk/nextjs/server';
 import { uploadPostImages } from './images';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import { PostResponseWithUser } from './posts';
 
-type CommentNode = {
-  comment: number;
-  replies: CommentNode[];
-};
+export interface CommentWithReplies extends PostResponseWithUser {
+  replies: CommentWithReplies[];
+}
 
 export async function getNestedComments(
   postId: number,
-): Promise<CommentNode[]> {
+): Promise<CommentWithReplies[]> {
+  
   const comments = await db
-    .select({ id: postsTable.id, postReference: postsTable.postReference })
+    .select()
     .from(postsTable)
-    .where(
-      and(eq(postsTable.postReference, postId), eq(postsTable.isComment, true)),
-    );
+    .where(eq(postsTable.isComment, true));
 
-  const buildTree = (parentId: number): CommentNode[] => {
+  const images = await db.select().from(imagesTable);
+  const userIds = [...new Set(comments.map((c) => c.userId))];
+  const users = (await clerkClient.users.getUserList({ userId: userIds })).data;
+
+  const getUserData = (userId: string) => {
+    const user = users.find((u) => u.id === userId);
+    return {
+      id: user?.id || '',
+      fullName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+      username: user?.username || '',
+      profileImageUrl: user?.imageUrl || '',
+    };
+  };
+
+  const buildTree = (parentId: number): CommentWithReplies[] => {
     return comments
       .filter((comment) => comment.postReference === parentId)
-      .map((comment) => ({
-        comment: comment.id,
-        replies: buildTree(comment.id),
-      }));
+      .map((comment) => {
+        const postImages = images.filter((img) => img.postId === comment.id);
+        return {
+          post: comment,
+          images: postImages.map(({ id, publicUrl }) => ({ id, publicUrl })),
+          user: getUserData(comment.userId),
+          replies: buildTree(comment.id),
+        };
+      });
   };
 
   return buildTree(postId);
