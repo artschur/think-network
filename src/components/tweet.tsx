@@ -67,7 +67,7 @@ export default function Tweet({
   };
 
   const handleShare = async () => {
-    const postUrl = `http://localhost:3000/posts/${tweet.post.id}`;
+    const postUrl = `http://localhost:3000/post/${tweet.post.id}`;
 
     try {
       await navigator.clipboard.writeText(postUrl);
