@@ -1,6 +1,6 @@
 'use client';
 
-import { MessageCircle, Heart, Share } from 'lucide-react';
+import { MessageCircle, Heart, CircleArrowOutUpRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,7 +9,9 @@ import { cn } from '@/lib/utils';
 import ImageGrid, { type GridImage } from '@/components/image-grid';
 import type { SimpleUserInfo } from '@/users';
 import { checkIfLiked, likePost, unlikePost } from '@/likes';
-import { toast } from 'sonner';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import ShareButton from './share-button';
 
 interface PostResponseWithUser {
   post: {
@@ -25,7 +27,7 @@ interface PostResponseWithUser {
     username: string;
     profileImageUrl: string;
   };
-  images?: { publicUrl: string }[];
+  images?: { publicUrl: string; }[];
 }
 
 export default function Tweet({
@@ -65,25 +67,6 @@ export default function Tweet({
       );
     }
   };
-
-  const handleShare = async () => {
-    const postUrl = `http://localhost:3000/post/${tweet.post.id}`;
-
-    try {
-      await navigator.clipboard.writeText(postUrl);
-      toast('Link copied to clipboard', {
-        description: 'You can now share this post with others',
-        icon: <Share className="h-4 w-4" />,
-      });
-    } catch (err) {
-      toast('Failed to copy link', {
-        description: 'Please try again',
-        icon: <Share className="h-4 w-4" />,
-      });
-      console.error('Failed to copy link:', err);
-    }
-  };
-
   const gridImages: GridImage[] =
     tweet.images?.map((img, index) => ({
       id: `tweet-${tweet.post.id}-image-${index}`,
@@ -91,7 +74,7 @@ export default function Tweet({
     })) || [];
 
   return (
-    <Card>
+    < Card >
       <CardContent className="p-6">
         <div className="flex gap-4">
           <Avatar className="h-12 w-12">
@@ -100,21 +83,30 @@ export default function Tweet({
           </Avatar>
 
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium hover:text-primary transition-colors text-foreground">
-                {tweet.user?.fullName}
-              </span>
-              <span className="text-muted-foreground">
-                @{tweet.user?.username}
-              </span>
-              <span className="text-muted-foreground">·</span>
-              <span className="text-muted-foreground hover:text-primary transition-colors">
-                {new Date(tweet.post.createdAt).toLocaleDateString()} at{' '}
-                {new Date(tweet.post.createdAt).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </span>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-row gap-2">
+                <span className="font-medium hover:text-primary transition-colors text-foreground">
+                  {tweet.user?.fullName}
+                </span>
+                <span className="text-muted-foreground">
+                  @{tweet.user?.username}
+                </span>
+                <span className="text-muted-foreground">·</span>
+                <span className="text-muted-foreground hover:text-primary transition-colors">
+                  {new Date(tweet.post.createdAt).toLocaleDateString()} at{' '}
+                  {new Date(tweet.post.createdAt).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              </div>
+              <Link href={`/post/${tweet.post.id}`}>
+                <Button
+                  className='text-neutral-400 cursor-pointer'
+                  variant={"ghost"}>
+                  <CircleArrowOutUpRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
 
             <div className="mt-2 text-[15px] leading-relaxed text-foreground">
@@ -152,19 +144,11 @@ export default function Tweet({
                 />
                 <span className="text-xs ml-1">{likeCount}</span>
               </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
-                onClick={handleShare}
-              >
-                <Share className="h-4 w-4" />
-              </Button>
+              <ShareButton loggedUserId={loggedUser.id} postUserId={tweet.user.id} />
             </div>
           </div>
         </div>
       </CardContent>
-    </Card>
+    </Card >
   );
 }

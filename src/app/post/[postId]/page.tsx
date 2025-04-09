@@ -1,36 +1,36 @@
-import { Suspense } from "react"
-import { notFound } from "next/navigation"
-import Sidebar from "@/components/sidebar"
-import WhoToFollow from "@/components/who-to-follow"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Search, MessageCircle } from "lucide-react"
-import { currentUser } from "@clerk/nextjs/server"
-import type { SimpleUserInfo } from "@/users"
-import PostDetail from "@/components/post-detail"
-import CommentSection from "@/components/comment-section"
-import CommentInput from "@/components/comment-input"
-import { getPostById } from "@/posts"
-import { getNestedComments } from "@/comments"
+import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import Sidebar from "@/components/sidebar";
+import WhoToFollow from "@/components/who-to-follow";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, MessageCircle } from "lucide-react";
+import { currentUser } from "@clerk/nextjs/server";
+import type { SimpleUserInfo } from "@/users";
+import PostDetail from "@/components/post-detail";
+import CommentSection from "@/components/comment-section";
+import CommentInput from "@/components/comment-input";
+import { getPostById } from "@/posts";
+import { getNestedComments } from "@/comments";
 
 interface PostPageProps {
   params: {
-    postId: string
-  }
+    postId: string;
+  };
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const { postId: postIdString } = await params
-  const postId = Number.parseInt(postIdString)
+  const { postId: postIdString } = await params;
+  const postId = Number.parseInt(postIdString);
 
   if (isNaN(postId)) {
-    notFound()
+    notFound();
   }
 
-  const response = await currentUser()
+  const response = await currentUser();
   if (!response) {
-    throw new Error("User not authenticated")
+    throw new Error("User not authenticated");
   }
 
   const user: SimpleUserInfo = {
@@ -38,7 +38,7 @@ export default async function PostPage({ params }: PostPageProps) {
     username: response?.username,
     fullName: response?.fullName,
     imageUrl: response?.imageUrl,
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,17 +70,17 @@ export default async function PostPage({ params }: PostPageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-async function PostContent({ postId, user }: { postId: number; user: SimpleUserInfo }) {
-  const post = await getPostById({ postId })
+async function PostContent({ postId, user }: { postId: number; user: SimpleUserInfo; }) {
+  const post = await getPostById({ postId });
 
   if (!post) {
-    notFound()
+    notFound();
   }
 
-  const comments = await getNestedComments(postId)
+  const comments = await getNestedComments(postId);
 
   return (
     <div className="space-y-6">
@@ -88,7 +88,7 @@ async function PostContent({ postId, user }: { postId: number; user: SimpleUserI
       <CommentInput postId={postId} user={user} />
       <CommentSection comments={comments} loggedUser={user} />
     </div>
-  )
+  );
 }
 
 function PostDetailSkeleton() {
@@ -137,7 +137,7 @@ function PostDetailSkeleton() {
           </Card>
         ))}
     </div>
-  )
+  );
 }
 
 function WhoToFollowSkeleton() {
@@ -164,5 +164,5 @@ function WhoToFollowSkeleton() {
           ))}
       </div>
     </Card>
-  )
+  );
 }
