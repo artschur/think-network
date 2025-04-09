@@ -41,35 +41,21 @@ export default async function PostPage({ params }: PostPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto flex min-h-screen py-6 gap-6">
-        <Sidebar user={user} />
 
-        <main className="flex-1 max-w-xl">
-          <Card className="sticky top-0 z-10 mb-6 border-b">
-            <CardHeader className="flex flex-row items-center">
-              <MessageCircle className="h-5 w-5 mr-2" />
-              <CardTitle>Post</CardTitle>
-            </CardHeader>
-          </Card>
+    <main className="flex-1 max-w-4xl w-full" >
+      <Card className="sticky top-0 z-10 mb-6 border-b">
+        <CardHeader className="flex flex-row items-center">
+          <MessageCircle className="h-5 w-5 mr-2" />
+          <CardTitle>Post</CardTitle>
+        </CardHeader>
+      </Card>
 
-          <Suspense fallback={<PostDetailSkeleton />}>
-            <PostContent postId={postId} user={user} />
-          </Suspense>
-        </main>
+      <Suspense fallback={<PostDetailSkeleton />}>
+        <PostContent postId={postId} user={user} />
+      </Suspense>
+    </main>
 
-        <div className="hidden lg:flex flex-col w-80 space-y-6 sticky top-6 h-[calc(100vh-3rem)]">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search" className="pl-9 rounded-full bg-primary" />
-          </div>
 
-          <Suspense fallback={<WhoToFollowSkeleton />}>
-            <WhoToFollow user={user} />
-          </Suspense>
-        </div>
-      </div>
-    </div>
   );
 }
 

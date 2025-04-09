@@ -1,12 +1,8 @@
 import { Suspense } from 'react';
-import Sidebar from '@/components/sidebar';
 import TweetInput from '@/components/tweet-input';
 import TweetFeed from '@/components/tweet-feed';
-import WhoToFollow from '@/components/who-to-follow';
 import { Card, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search } from 'lucide-react';
 import { currentUser } from '@clerk/nextjs/server';
 import type { SimpleUserInfo } from '@/users';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,68 +22,50 @@ export default async function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto flex min-h-screen py-6 gap-6">
-        <Sidebar user={user} />
 
-        <main className="flex-1 max-w-xl">
-          <Tabs defaultValue="for-you">
-            <Card className="sticky top-0 z-10 mb-6 border-b">
-              <CardHeader className="pb-3">
+    <main className="flex-1 max-w-4xl w-full">
+      <Tabs defaultValue="for-you">
+        <Card className="sticky top-0 z-10 mb-6 border-b">
+          <CardHeader className="pb-3">
 
-                <TabsList className="w-full">
-                  <TabsTrigger value="for-you" className="flex-1 cursor-pointer">
-                    For You
-                  </TabsTrigger>
-                  <TabsTrigger value="following" className="flex-1 cursor-pointer">
-                    Following
-                  </TabsTrigger>
-                </TabsList>
+            <TabsList className="w-full">
+              <TabsTrigger value="for-you" className="flex-1 cursor-pointer">
+                For You
+              </TabsTrigger>
+              <TabsTrigger value="following" className="flex-1 cursor-pointer">
+                Following
+              </TabsTrigger>
+            </TabsList>
 
-              </CardHeader>
-            </Card>
+          </CardHeader>
+        </Card>
 
-            <TweetInput user={user} />
+        <TweetInput user={user} />
 
-            <TabsContent value="for-you">
-              <Suspense fallback={<TweetFeedSkeleton />}>
-                <FeaturedFeed loggedUser={user} />
-              </Suspense>
-            </TabsContent>
-
-            <TabsContent value="following">
-              <Suspense fallback={<TweetFeedSkeleton />}>
-                <FollowingFeed loggedUser={user} />
-              </Suspense>
-            </TabsContent>
-          </Tabs>
-        </main>
-
-        <div className="hidden lg:flex flex-col w-80 space-y-6 sticky top-6 h-[calc(100vh-3rem)]">
-          
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search"
-              className="pl-9 rounded-full bg-primary"
-            />
-          </div>
-
-          <Suspense fallback={<WhoToFollowSkeleton />}>
-            <WhoToFollow user={user} />
+        <TabsContent value="for-you">
+          <Suspense fallback={<TweetFeedSkeleton />}>
+            <FeaturedFeed loggedUser={user} />
           </Suspense>
-        </div>
-      </div>
-    </div>
+        </TabsContent>
+
+        <TabsContent value="following">
+          <Suspense fallback={<TweetFeedSkeleton />}>
+            <FollowingFeed loggedUser={user} />
+          </Suspense>
+        </TabsContent>
+      </Tabs>
+    </main>
+
+
   );
 }
 
-async function FeaturedFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
+async function FeaturedFeed({ loggedUser }: { loggedUser: SimpleUserInfo; }) {
   const tweets = await getTopPosts();
   return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
 }
 
-async function FollowingFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
+async function FollowingFeed({ loggedUser }: { loggedUser: SimpleUserInfo; }) {
   const tweets = await getPostsByFollowing({ userId: loggedUser.id });
   return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
 }
@@ -113,7 +91,7 @@ function WhoToFollowSkeleton() {
               <Skeleton className="h-9 w-16 rounded-full" />
             </div>
           ))}
-          
+
       </div>
     </Card>
   );

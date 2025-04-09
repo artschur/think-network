@@ -16,7 +16,7 @@ import { UserButton } from '@clerk/nextjs';
 import { SimpleUserInfo } from '@/users';
 import { Suspense } from 'react';
 
-export default function Sidebar({ user }: { user: SimpleUserInfo }) {
+export default function Sidebar({ user }: { user: SimpleUserInfo; }) {
   const navItems = [
     { icon: Home, label: 'Home', href: '/home' },
     { icon: Search, label: 'Explore', href: '/explore' },
@@ -28,7 +28,7 @@ export default function Sidebar({ user }: { user: SimpleUserInfo }) {
   ];
 
   return (
-    <div className="w-20 xl:w-64 sticky top-6 h-[calc(100vh-3rem)]">
+    <div className="fixed top-16 left-0 bottom-0 w-20 xl:w-64 p-4 z-10">
       <Card className="flex flex-col h-full p-4">
         <div className="p-2 mb-6 rounded-full bg-blue-400 w-fit mx-auto xl:mx-0">
           <Brain className="h-7 w-7 text-primary-foreground" />

@@ -117,15 +117,17 @@ export default function Tweet({
               <ImageGrid images={gridImages} className="mt-3" />
             )}
 
-            <div className="mt-6 flex justify-between max-w-md">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span className="text-xs ml-1">{tweet.post.commentCount}</span>
-              </Button>
+            <div className="mt-6 flex justify-between w-full">
+              <Link href={`/post/${tweet.post.id}`}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="text-xs ml-1">{tweet.post.commentCount}</span>
+                </Button>
+              </Link>
 
               <Button
                 variant="ghost"
