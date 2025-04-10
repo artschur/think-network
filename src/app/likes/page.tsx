@@ -1,19 +1,18 @@
-import { Suspense } from "react"
-import Sidebar from "@/components/sidebar"
-import TweetFeed from "@/components/tweet-feed"
-import WhoToFollow from "@/components/who-to-follow"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Search, Heart } from "lucide-react"
-import { currentUser } from "@clerk/nextjs/server"
-import type { SimpleUserInfo } from "@/users"
-import { getLikedPostsByUser } from "@/posts"
+import { Suspense } from "react";
+import TweetFeed from "@/components/tweet-feed";
+import WhoToFollow from "@/components/who-to-follow";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, Heart } from "lucide-react";
+import { currentUser } from "@clerk/nextjs/server";
+import type { SimpleUserInfo } from "@/users";
+import { getLikedPostsByUser } from "@/posts";
 
 export default async function LikesPage() {
-  const response = await currentUser()
+  const response = await currentUser();
   if (!response) {
-    throw new Error("User not authenticated")
+    throw new Error("User not authenticated");
   }
 
   const user: SimpleUserInfo = {
@@ -21,14 +20,12 @@ export default async function LikesPage() {
     username: response?.username,
     fullName: response?.fullName,
     imageUrl: response?.imageUrl,
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto flex min-h-screen py-6 gap-6">
-        <Sidebar user={user} />
-
-        <main className="flex-1 max-w-xl">
+        <main className="flex-1 max-w-3xl">
           <Card className="sticky top-0 z-10 mb-6 border-b">
             <CardHeader className="flex flex-row items-center">
               <Heart className="h-5 w-5 text-rose-500 mr-2" />
@@ -53,12 +50,12 @@ export default async function LikesPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-async function LikedFeed({ loggedUser }: { loggedUser: SimpleUserInfo }) {
-  const tweets = await getLikedPostsByUser({ userId: loggedUser.id })
-  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />
+async function LikedFeed({ loggedUser }: { loggedUser: SimpleUserInfo; }) {
+  const tweets = await getLikedPostsByUser({ userId: loggedUser.id });
+  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
 }
 
 function WhoToFollowSkeleton() {
@@ -85,7 +82,7 @@ function WhoToFollowSkeleton() {
           ))}
       </div>
     </Card>
-  )
+  );
 }
 
 function TweetFeedSkeleton() {
@@ -115,5 +112,5 @@ function TweetFeedSkeleton() {
           </Card>
         ))}
     </div>
-  )
+  );
 }

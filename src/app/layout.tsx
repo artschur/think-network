@@ -1,12 +1,15 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { ClerkProvider, RedirectToSignIn, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { ClerkProvider, SignInButton, SignedOut } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import Sidebar from "@/components/sidebar";
 import { currentUser } from "@clerk/nextjs/server";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/ui/app-sidebar";
+import { redirect } from "next/navigation";
+import { ModeToggle } from "@/components/theme-toggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,28 +33,28 @@ export default async function RootLayout({
 }>) {
   const user = await currentUser();
   if (!user) {
-    return <RedirectToSignIn />;
+    redirect("/");
   }
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased dark:text-white`}>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <header className="fixed top-0 left-0 right-0 flex justify-end items-center p-4 gap-4 h-16 bg-background z-20">
-              <SignedOut>
-                <SignInButton />
-                <SignUpButton />
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-            </header>
-            <div className="flex min-h-screen pt-16 bg-background">
-              <Sidebar user={user} />
-              <main className="flex-1 ml-20 xl:ml-64 p-4">
-                {children}
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <SidebarProvider>
+              <AppSidebar />
+              <main className="w-full min-h-full flex flex-col items-center">
+                <nav className="sticky top-0 h-14 bg-background z-10 border-b w-full flex items-center justify-between px-4">
+                  <SidebarTrigger />
+                  <SignedOut>
+                    <SignInButton mode="modal" />
+                  </SignedOut>
+                  <ModeToggle />
+                </nav>
+                <div className="w-full max-w-6xl mx-auto px-4 py-8">
+                  {children}
+                </div>
               </main>
-            </div>
+            </SidebarProvider>
             <Toaster />
           </ThemeProvider>
         </body>
@@ -59,3 +62,4 @@ export default async function RootLayout({
     </ClerkProvider>
   );
 }
+
