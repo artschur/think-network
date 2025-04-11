@@ -10,7 +10,7 @@ export default function TweetFeed({
   loggedUser: SimpleUserInfo;
 }) {
   return (
-    <div className="space-y-6 md:min-w-4xl ">
+    <div className="space-y-6 md:min-w-2xl ">
       {tweets.map((tweet) => (
         <Tweet key={tweet.post.id} tweet={tweet} loggedUser={loggedUser} />
       ))}
