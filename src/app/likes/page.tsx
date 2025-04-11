@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import TweetFeed from "@/components/tweet-feed";
-import WhoToFollow from "@/components/who-to-follow";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,6 +7,7 @@ import { Search, Heart } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import type { SimpleUserInfo } from "@/users";
 import { getLikedPostsByUser } from "@/posts";
+import WhoToFollowWrapper from "@/components/who-to-follow-wrapper";
 
 export default async function LikesPage() {
   const response = await currentUser();
@@ -52,7 +52,7 @@ export default async function LikesPage() {
           </div>
 
           <Suspense fallback={<WhoToFollowSkeleton />}>
-            <WhoToFollow user={user} />
+            <WhoToFollowWrapper user={user} />
           </Suspense>
         </div>
       </aside>

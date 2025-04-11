@@ -1,11 +1,8 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import Sidebar from "@/components/sidebar";
-import WhoToFollow from "@/components/who-to-follow";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { currentUser } from "@clerk/nextjs/server";
 import type { SimpleUserInfo } from "@/users";
 import PostDetail from "@/components/post-detail";
@@ -13,6 +10,7 @@ import CommentSection from "@/components/comment-section";
 import CommentInput from "@/components/comment-input";
 import { getPostById } from "@/posts";
 import { getNestedComments } from "@/comments";
+import WhoToFollowWrapper from "@/components/who-to-follow-wrapper";
 
 interface PostPageProps {
   params: {
@@ -63,7 +61,9 @@ export default async function PostPage({ params }: PostPageProps) {
 
       {/* Right sidebar - hidden on mobile, sticky position on desktop */}
       <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:top-20 md:self-start h-fit">
-        <WhoToFollow user={user} />
+        <Suspense fallback={<WhoToFollowSkeleton />}>
+          <WhoToFollowWrapper user={user} />
+        </Suspense>
       </aside>
     </div>
   );
