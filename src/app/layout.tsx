@@ -50,7 +50,7 @@ export default async function RootLayout({
                   <ModeToggle />
                 </nav>
                 <AppSidebar />
-                <div className="w-full max-w-6xl px-8 py-8">
+                <div className="w-full px-8 py-4 md:px-8 md:py-8">
                   {children}
                 </div>
               </main>

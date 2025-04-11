@@ -1,15 +1,15 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { getRecommendedUsers, type SimpleUserInfo } from "@/users"
-import { FollowButton } from "@/components/follow-button"
-import { checkIfFollowing } from "@/followers"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { getRecommendedUsers, type SimpleUserInfo } from "@/users";
+import { FollowButton } from "@/components/follow-button";
+import { checkIfFollowing } from "@/followers";
 
-export default async function WhoToFollow({ user }: { user: SimpleUserInfo }) {
-  const users = await getRecommendedUsers({ userId: user.id })
+export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
+  const users = await getRecommendedUsers({ userId: user.id });
 
   if (users.length <= 0) {
     return (
-      <Card className="backdrop-blur-xl overflow-x-hidden shadow-lg border backdrop-filter">
+      <Card className="w-full backdrop-blur-xl overflow-x-hidden shadow-lg border backdrop-filter">
         <CardHeader className="border-b">
           <h2 className="text-xl font-medium">Who to follow</h2>
         </CardHeader>
@@ -17,26 +17,26 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo }) {
           No recommendations available at this time.
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const usersWithFollowStatus = await Promise.all(
     users.map(async (recommendedUser) => {
-      
+
       const isFollowing = await checkIfFollowing({
         userId: user.id,
         followingId: recommendedUser.id,
-      }).catch(() => false)
+      }).catch(() => false);
 
       return {
         ...recommendedUser,
         isFollowing,
-      }
+      };
     }),
-  )
+  );
 
   return (
-    <Card className="backdrop-blur-xl overflow-x-hidden shadow-lg border backdrop-filter">
+    <Card className="w-full backdrop-blur-xl overflow-x-hidden shadow-lg border backdrop-filter">
       <CardHeader className="border-b">
         <h2 className="text-xl font-medium">Who to follow</h2>
       </CardHeader>
@@ -74,6 +74,5 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo }) {
         </a>
       </CardFooter>
     </Card>
-  )
+  );
 }
-

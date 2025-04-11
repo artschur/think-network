@@ -7,6 +7,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import type { SimpleUserInfo } from '@/users';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getTopPosts, getPostsByFollowing } from '@/posts';
+import WhoToFollow from '@/components/who-to-follow';
 
 export default async function Home() {
   const response = await currentUser();
@@ -22,41 +23,48 @@ export default async function Home() {
   };
 
   return (
+    <div className="flex w-full">
+      {/* Left sidebar - hidden on mobile, fixed position on desktop */}
+      <div className="hidden md:block md:w-72 shrink-0"></div>
 
-    <main className=" flex flex-col items-center max-w-full">
-      <Tabs defaultValue="for-you" className=''>
-        <Card className="mb-6 border-b">
-          <CardHeader className="pb-3">
+      {/* Main content - centered and with max width */}
+      <main className="flex-1 flex flex-col items-center">
+        <div className="w-full max-w-xl mx-auto">
+          <Tabs defaultValue="for-you" className="w-full">
+            <Card className="mb-6 border-b">
+              <CardHeader className="pb-3">
+                <TabsList className="w-full">
+                  <TabsTrigger value="for-you" className="flex-1 cursor-pointer">
+                    For You
+                  </TabsTrigger>
+                  <TabsTrigger value="following" className="flex-1 cursor-pointer">
+                    Following
+                  </TabsTrigger>
+                </TabsList>
+              </CardHeader>
+            </Card>
 
-            <TabsList className="w-full">
-              <TabsTrigger value="for-you" className="flex-1 cursor-pointer">
-                For You
-              </TabsTrigger>
-              <TabsTrigger value="following" className="flex-1 cursor-pointer">
-                Following
-              </TabsTrigger>
-            </TabsList>
+            <TweetInput user={user} />
 
-          </CardHeader>
-        </Card>
+            <TabsContent value="for-you">
+              <Suspense fallback={<TweetFeedSkeleton />}>
+                <FeaturedFeed loggedUser={user} />
+              </Suspense>
+            </TabsContent>
 
-        <TweetInput user={user} />
+            <TabsContent value="following">
+              <Suspense fallback={<TweetFeedSkeleton />}>
+                <FollowingFeed loggedUser={user} />
+              </Suspense>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
 
-        <TabsContent value="for-you">
-          <Suspense fallback={<TweetFeedSkeleton />}>
-            <FeaturedFeed loggedUser={user} />
-          </Suspense>
-        </TabsContent>
-
-        <TabsContent value="following">
-          <Suspense fallback={<TweetFeedSkeleton />}>
-            <FollowingFeed loggedUser={user} />
-          </Suspense>
-        </TabsContent>
-      </Tabs>
-    </main>
-
-
+      <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:right-20 md:top-20 md:self-start h-fit">
+        <WhoToFollow user={user} />
+      </aside>
+    </div>
   );
 }
 

@@ -23,10 +23,14 @@ export default async function LikesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto flex min-h-screen py-6 gap-6">
-        <main className="flex-1 max-w-3xl">
-          <Card className="sticky top-0 z-10 mb-6 border-b">
+    <div className="flex w-full">
+      {/* Left sidebar - empty placeholder for balance */}
+      <div className="hidden md:block md:w-72 shrink-0"></div>
+
+      {/* Main content - centered and with max width */}
+      <main className="flex-1 flex flex-col items-center">
+        <div className="w-full max-w-xl mx-auto">
+          <Card className="top-10 z-10 mb-6 border-b">
             <CardHeader className="flex flex-row items-center">
               <Heart className="h-5 w-5 text-rose-500 mr-2" />
               <CardTitle>Liked Posts</CardTitle>
@@ -36,9 +40,12 @@ export default async function LikesPage() {
           <Suspense fallback={<TweetFeedSkeleton />}>
             <LikedFeed loggedUser={user} />
           </Suspense>
-        </main>
+        </div>
+      </main>
 
-        <div className="hidden lg:flex flex-col w-80 space-y-6 sticky top-6 h-[calc(100vh-3rem)]">
+      {/* Right sidebar - hidden on mobile, sticky position on desktop */}
+      <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:top-20 md:self-start h-fit">
+        <div className="space-y-6">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search" className="pl-9 rounded-full bg-primary" />
@@ -48,7 +55,7 @@ export default async function LikesPage() {
             <WhoToFollow user={user} />
           </Suspense>
         </div>
-      </div>
+      </aside>
     </div>
   );
 }
