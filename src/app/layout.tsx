@@ -41,7 +41,6 @@ export default async function RootLayout({
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased dark:text-white`}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <SidebarProvider>
-              <AppSidebar />
               <main className="w-full min-h-full flex flex-col items-center">
                 <nav className="sticky top-0 h-14 bg-background z-10 border-b w-full flex items-center justify-between px-4">
                   <SidebarTrigger />
@@ -50,7 +49,8 @@ export default async function RootLayout({
                   </SignedOut>
                   <ModeToggle />
                 </nav>
-                <div className="w-full max-w-6xl mx-auto px-4 py-8">
+                <AppSidebar />
+                <div className="w-full max-w-6xl px-8 py-8">
                   {children}
                 </div>
               </main>

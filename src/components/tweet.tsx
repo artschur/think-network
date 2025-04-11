@@ -10,7 +10,6 @@ import ImageGrid, { type GridImage } from '@/components/image-grid';
 import type { SimpleUserInfo } from '@/users';
 import { checkIfLiked, likePost, unlikePost } from '@/likes';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import ShareButton from './share-button';
 
 interface PostResponseWithUser {
@@ -67,6 +66,7 @@ export default function Tweet({
       );
     }
   };
+
   const gridImages: GridImage[] =
     tweet.images?.map((img, index) => ({
       id: `tweet-${tweet.post.id}-image-${index}`,
@@ -74,66 +74,74 @@ export default function Tweet({
     })) || [];
 
   return (
-    < Card >
-      <CardContent className="p-6">
-        <div className="flex gap-4">
-          <Avatar className="h-12 w-12">
-            <AvatarFallback>{tweet.user?.fullName[0]}</AvatarFallback>
-            <AvatarImage src={tweet.user?.profileImageUrl} />
-          </Avatar>
+    <Card className="w-full max-w-md md:min-w-2xl overflow-hidden">
+      <CardContent className="p-4">
+        <div className="grid grid-cols-[auto_1fr] gap-3">
+          {/* Avatar */}
+          <div>
+            <Avatar className="h-10 w-10">
+              <AvatarFallback>{tweet.user?.fullName[0]}</AvatarFallback>
+              <AvatarImage src={tweet.user?.profileImageUrl} />
+            </Avatar>
+          </div>
 
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-row gap-2">
-                <span className="font-medium hover:text-primary transition-colors text-foreground">
+          {/* Content area */}
+          <div className="min-w-0"> {/* min-w-0 prevents overflow */}
+            {/* User info and date */}
+            <div className="flex justify-between items-start mb-1">
+              <div className="flex flex-wrap items-center gap-x-1 min-w-0 pr-2">
+                <span className="font-medium text-foreground truncate">
                   {tweet.user?.fullName}
                 </span>
-                <span className="text-muted-foreground">
+                <span className="text-muted-foreground text-sm truncate">
                   @{tweet.user?.username}
                 </span>
-                <span className="text-muted-foreground">·</span>
-                <span className="text-muted-foreground hover:text-primary transition-colors">
-                  {new Date(tweet.post.createdAt).toLocaleDateString()} at{' '}
-                  {new Date(tweet.post.createdAt).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                <span className="text-muted-foreground mx-0.5 hidden sm:inline">·</span>
+                <span className="text-muted-foreground text-sm truncate hidden sm:inline">
+                  {new Date(tweet.post.createdAt).toLocaleDateString()}
                 </span>
               </div>
-              <Link href={`/post/${tweet.post.id}`}>
+              <Link href={`/post/${tweet.post.id}`} className="shrink-0">
                 <Button
-                  className='text-neutral-400 cursor-pointer'
-                  variant={"ghost"}>
+                  className="text-neutral-400 h-8 w-8 p-0"
+                  variant="ghost"
+                  size="sm"
+                >
                   <CircleArrowOutUpRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-2 text-[15px] leading-relaxed text-foreground">
+            {/* Tweet content */}
+            <div className="text-sm text-foreground mb-2 break-words whitespace-pre-wrap">
               {tweet.post.content}
             </div>
 
+            {/* Images container with proper containment */}
             {gridImages.length > 0 && (
-              <ImageGrid images={gridImages} className="mt-3" />
+              <div className="w-full mb-3 overflow-hidden">
+                <ImageGrid images={gridImages} />
+              </div>
             )}
 
-            <div className="mt-6 flex justify-between w-full">
+            {/* Action buttons */}
+            <div className="flex justify-between items-center mt-2">
               <Link href={`/post/${tweet.post.id}`}>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
+                  size="sm"
+                  className="h-8 rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  <span className="text-xs ml-1">{tweet.post.commentCount}</span>
+                  <span className="text-xs">{tweet.post.commentCount}</span>
                 </Button>
               </Link>
 
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 className={cn(
-                  'rounded-full flex items-center gap-1 cursor-pointer',
+                  'h-8 rounded-full flex items-center gap-1',
                   liked
                     ? 'text-destructive hover:text-destructive hover:bg-destructive/10'
                     : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
@@ -144,13 +152,14 @@ export default function Tweet({
                   className="h-4 w-4"
                   fill={liked ? 'currentColor' : 'none'}
                 />
-                <span className="text-xs ml-1">{likeCount}</span>
+                <span className="text-xs">{likeCount}</span>
               </Button>
+
               <ShareButton loggedUserId={loggedUser.id} postUserId={tweet.user.id} />
             </div>
           </div>
         </div>
       </CardContent>
-    </Card >
+    </Card>
   );
 }

@@ -23,9 +23,9 @@ export default async function Home() {
 
   return (
 
-    <main className="flex-1 max-w-4xl w-full">
-      <Tabs defaultValue="for-you">
-        <Card className="sticky top-0 z-10 mb-6 border-b">
+    <main className=" flex flex-col items-center max-w-full">
+      <Tabs defaultValue="for-you" className=''>
+        <Card className="mb-6 border-b">
           <CardHeader className="pb-3">
 
             <TabsList className="w-full">
