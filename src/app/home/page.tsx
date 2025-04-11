@@ -24,10 +24,8 @@ export default async function Home() {
 
   return (
     <div className="flex w-full">
-      {/* Left sidebar - hidden on mobile, fixed position on desktop */}
       <div className="hidden md:block md:w-72 shrink-0"></div>
 
-      {/* Main content - centered and with max width */}
       <main className="flex-1 flex flex-col items-center">
         <div className="w-full max-w-xl mx-auto">
           <Tabs defaultValue="for-you" className="w-full">
