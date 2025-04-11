@@ -1,15 +1,29 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getRecommendedUsers, type SimpleUserInfo } from "@/users";
-import { FollowButton } from "@/components/follow-button";
-import { checkIfFollowing } from "@/followers";
-import { UserPlus } from "lucide-react";
+"use client"
 
-export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
-  const maxRecommendedUsers = 10;
-  const users = await getRecommendedUsers({ userId: user.id, limit: maxRecommendedUsers });
+import { useState } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
+import type { SimpleUserInfo } from "@/users"
+import { FollowButton } from "@/components/follow-button"
+import { ChevronDown, UserPlus } from "lucide-react"
 
-  if (users.length <= 0) {
+type UserWithFollowStatus = SimpleUserInfo & {
+  isFollowing: boolean
+  userId: string
+}
+
+export default function WhoToFollow({
+  initialUsers,
+}: {
+  initialUsers: UserWithFollowStatus[]
+}) {
+  const [showAll, setShowAll] = useState(false)
+
+  const visibleUsers = showAll ? initialUsers : initialUsers.slice(0, 5)
+  const hasMoreUsers = initialUsers.length > 5
+
+  if (initialUsers.length <= 0) {
     return (
       <Card className="w-full backdrop-blur-xl overflow-hidden shadow-lg border border-border/50">
         <CardHeader className="border-b pb-3">
@@ -25,20 +39,6 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
     )
   }
 
-  const usersWithFollowStatus = await Promise.all(
-    users.map(async (recommendedUser) => {
-      const isFollowing = await checkIfFollowing({
-        userId: user.id,
-        followingId: recommendedUser.id,
-      }).catch(() => false);
-
-      return {
-        ...recommendedUser,
-        isFollowing,
-      };
-    }),
-  );
-
   return (
     <Card className="w-full backdrop-blur-xl overflow-hidden shadow-lg border border-border/50">
       <CardHeader className="border-b pb-3">
@@ -49,7 +49,7 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
       </CardHeader>
 
       <CardContent className="p-0 divide-y divide-border/50">
-        {usersWithFollowStatus.map((recommendedUser) => (
+        {visibleUsers.map((recommendedUser) => (
           <div
             key={recommendedUser.id}
             className="px-5 py-4 hover:bg-muted/30 transition-all duration-200 flex items-center justify-between group"
@@ -71,13 +71,27 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
             </div>
 
             <FollowButton
-              userId={user.id}
+              userId={recommendedUser.userId}
               followingId={recommendedUser.id}
               initiallyFollowing={recommendedUser.isFollowing}
             />
           </div>
         ))}
       </CardContent>
+
+      {hasMoreUsers && (
+        <CardFooter className="p-2 flex justify-center border-t">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full text-primary flex items-center gap-1"
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? "Show less" : "Show more"}
+            <ChevronDown className={`h-4 w-4 transition-transform ${showAll ? "rotate-180" : ""}`} />
+          </Button>
+        </CardFooter>
+      )}
     </Card>
-  );
+  )
 }

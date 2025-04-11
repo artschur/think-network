@@ -7,7 +7,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import type { SimpleUserInfo } from '@/users';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getTopPosts, getPostsByFollowing } from '@/posts';
-import WhoToFollow from '@/components/who-to-follow';
+import WhoToFollowWrapper from '@/components/who-to-follow-wrapper';
 
 export default async function Home() {
   const response = await currentUser();
@@ -63,7 +63,7 @@ export default async function Home() {
 
       <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:right-20 md:top-20 md:self-start h-fit">
         <Suspense fallback={<WhoToFollowSkeleton />}>
-          <WhoToFollow user={user} />
+          <WhoToFollowWrapper user={user} />
         </Suspense>
       </aside>
     </div>
