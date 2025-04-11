@@ -61,11 +61,11 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
                 <AvatarImage src={recommendedUser.imageUrl} />
               </Avatar>
 
-              <div className="transition-all duration-200">
-                <div className="font-medium group-hover:text-primary transition-colors duration-200 flex items-center gap-1">
+              <div className="transition-all duration-200 max-w-[95px]">
+                <div className="font-medium group-hover:text-primary transition-colors duration-200 truncate">
                   {recommendedUser.fullName}
                 </div>
-                <div className="text-sm text-muted-foreground">@{recommendedUser.username}</div>
+                <div className="text-sm text-muted-foreground truncate">@{recommendedUser.username}</div>
               </div>
             </div>
 
