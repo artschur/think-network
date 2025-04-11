@@ -11,24 +11,21 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { UserButton } from "@clerk/nextjs";
+import { ModeToggle } from "../theme-toggle";
 
 // Menu items.
 const items = [
     {
         title: "Home",
-        url: "#",
+        url: "/home",
         icon: Home,
     },
     {
         title: "Likes",
-        url: "#",
+        url: "/likes",
         icon: Heart,
     },
-    {
-        title: "Posts",
-        url: "#",
-        icon: Inbox,
-    },
+
 
 ];
 
@@ -51,8 +48,9 @@ export function AppSidebar() {
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 ))}
-                                <div className="pl-2">
+                                <div className="pr-8 pl-2 flex items-center justify-between">
                                     <UserButton />
+                                    <ModeToggle />
                                 </div>
                             </SidebarMenu>
                         </SidebarGroupContent>
