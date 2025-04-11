@@ -1,9 +1,9 @@
 'use server';
 
-import { and, eq, inArray, desc, count, not } from 'drizzle-orm';
 import { db } from './db';
 import { followersTable, PostSelect } from './db/schema';
 import { clerkClient } from './db';
+import { eq, not, inArray, and } from 'drizzle-orm';
 
 export interface SimpleUserInfo {
   id: string;
@@ -12,67 +12,48 @@ export interface SimpleUserInfo {
   imageUrl: string;
 }
 
-export async function getRecommendedUsers({ userId }: { userId: string }) {
-  const getPeopleUserFollows = await db
-    .select({ following: followersTable.followingId })
+export async function getRecommendedUsers({
+  userId,
+  limit,
+}: {
+  userId: string;
+  limit: number;
+}): Promise<SimpleUserInfo[]> {
+  
+  const following = await db
+    .select({ id: followersTable.followingId })
     .from(followersTable)
-    .where(eq(followersTable.userId, userId))
-    .limit(20);
+    .where(eq(followersTable.userId, userId));
 
-  const followingIds: string[] = getPeopleUserFollows.map(
-    (follower) => follower.following,
-  );
+  const followingIds = following.map((f) => f.id);
 
-  const [secondDegreeConnections, getFollowersThatUserDoesNotFollow] =
-    await Promise.all([
+  const nonFollowedUsers = await db
+    .select({ id: followersTable.userId })
+    .from(followersTable)
+    .where(
+      and(
+        not(eq(followersTable.userId, userId)),
+        not(inArray(followersTable.userId, followingIds)),
+      )
+    )
+    .groupBy(followersTable.userId)
+    .limit(limit);
 
-      followingIds.length > 0
-        ? db
-            .select({ userId: followersTable.followingId })
-            .from(followersTable)
-            .where(
-              and(
-                inArray(followersTable.userId, followingIds),
-                not(eq(followersTable.followingId, userId)),
-                not(inArray(followersTable.followingId, followingIds)),
-              ),
-            )
-            .groupBy(followersTable.followingId)
-            .orderBy(desc(count(followersTable.followingId)))
-            .limit(10)
-        : db
-            .select({ userId: followersTable.followingId })
-            .from(followersTable)
-            .groupBy(followersTable.followingId)
-            .orderBy(desc(count(followersTable.followingId)))
-            .limit(10),
+  let recommendedIds = nonFollowedUsers.map((u) => u.id);
 
-      db
-        .select({ userId: followersTable.userId })
-        .from(followersTable)
-        .where(
-          and(
-            eq(followersTable.followingId, userId),
-            not(inArray(followersTable.userId, followingIds)),
-          ),
-        )
-        .limit(5),
-    ]);
-
-  const allRecommendedUserIds = [
-    ...new Set([
-      ...secondDegreeConnections.map((user) => `+${user.userId}`),
-      ...getFollowersThatUserDoesNotFollow.map((user) => `+${user.userId}`),
-    ]),
-  ].filter((id) => id !== `+${userId}`);
-
-  if (allRecommendedUserIds.length === 0) {
-    return [];
+  if (recommendedIds.length < limit) {
+    const remaining = limit - recommendedIds.length;
+    const fallbackFollowing = followingIds
+      .filter((id) => id !== userId)
+      .slice(0, remaining);
+    recommendedIds = [...recommendedIds, ...fallbackFollowing];
   }
 
+  if (recommendedIds.length === 0) return [];
+
   const usersInfo = await clerkClient.users.getUserList({
-    userId: allRecommendedUserIds,
-    limit: 10,
+    userId: recommendedIds,
+    limit,
   });
 
   return usersInfo.data.map((user) => ({
