@@ -48,7 +48,7 @@ export default async function PostPage({ params }: PostPageProps) {
       {/* Main content - centered and with max width */}
       <main className="flex-1 flex flex-col items-center">
         <div className="w-full max-w-xl mx-auto">
-          <Card className="sticky top-0 z-10 mb-6 border-b">
+          <Card className="top-10 z-10 mb-6 border-b">
             <CardHeader className="flex flex-row items-center">
               <MessageCircle className="h-5 w-5 mr-2" />
               <CardTitle>Post</CardTitle>
