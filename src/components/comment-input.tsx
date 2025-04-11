@@ -1,67 +1,67 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { ImagePlus, Smile, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import type { SimpleUserInfo } from "@/users"
-import { cn } from "@/lib/utils"
-import { createComment } from "@/comments"
-import { useRouter } from "next/navigation"
-import ImageGrid from "./image-grid"
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import { ImagePlus, Smile, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import type { SimpleUserInfo } from "@/users";
+import { cn } from "@/lib/utils";
+import { createComment } from "@/comments";
+import { useRouter } from "next/navigation";
+import ImageGrid from "./image-grid";
 
-const MAX_COMMENT_LENGTH = 280
-const MAX_IMAGES = 4
+const MAX_COMMENT_LENGTH = 280;
+const MAX_IMAGES = 4;
 
 type UploadingImage = {
-  id: string
-  file: File
-  previewUrl: string
-  progress: number
-  uploading: boolean
-  error?: string
-}
+  id: string;
+  file: File;
+  previewUrl: string;
+  progress: number;
+  uploading: boolean;
+  error?: string;
+};
 
 interface CommentInputProps {
-  postId: number
-  user: SimpleUserInfo
-  isReply?: boolean
+  postId: number;
+  user: SimpleUserInfo;
+  isReply?: boolean;
 }
 
 export default function CommentInput({ postId, user, isReply = false }: CommentInputProps) {
-  const [comment, setComment] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [images, setImages] = useState<UploadingImage[]>([])
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
+  const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [images, setImages] = useState<UploadingImage[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
-  }, [comment])
+  }, [comment]);
 
-  const remainingChars = MAX_COMMENT_LENGTH - comment.length
-  const isOverLimit = remainingChars < 0
-  const canAddMoreImages = images.length < MAX_IMAGES
+  const remainingChars = MAX_COMMENT_LENGTH - comment.length;
+  const isOverLimit = remainingChars < 0;
+  const canAddMoreImages = images.length < MAX_IMAGES;
 
   const handleImageClick = () => {
     if (canAddMoreImages && fileInputRef.current) {
-      fileInputRef.current.click()
+      fileInputRef.current.click();
     }
-  }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !canAddMoreImages) return
+    if (!e.target.files || !canAddMoreImages) return;
 
-    const newFiles = Array.from(e.target.files)
-    const validFiles = newFiles.slice(0, MAX_IMAGES - images.length)
+    const newFiles = Array.from(e.target.files);
+    const validFiles = newFiles.slice(0, MAX_IMAGES - images.length);
 
     const newImages: UploadingImage[] = validFiles.map((file) => ({
       id: Math.random().toString(36).substring(2, 9),
@@ -69,90 +69,90 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
       previewUrl: URL.createObjectURL(file),
       progress: 0,
       uploading: false,
-    }))
+    }));
 
-    setImages((prev) => [...prev, ...newImages])
+    setImages((prev) => [...prev, ...newImages]);
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
 
     newImages.forEach((image) => {
-      simulateImageUpload(image.id)
-    })
-  }
+      simulateImageUpload(image.id);
+    });
+  };
 
   const simulateImageUpload = (imageId: string) => {
-    setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, uploading: true } : img)))
+    setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, uploading: true } : img)));
 
-    let progress = 0
+    let progress = 0;
     const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 15) + 5
+      progress += Math.floor(Math.random() * 15) + 5;
 
       if (progress >= 100) {
-        clearInterval(interval)
-        progress = 100
+        clearInterval(interval);
+        progress = 100;
 
-        setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, progress, uploading: false } : img)))
+        setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, progress, uploading: false } : img)));
       } else {
-        setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, progress } : img)))
+        setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, progress } : img)));
       }
-    }, 300)
-  }
+    }, 300);
+  };
 
   const removeImage = (imageId: string) => {
     setImages((prev) => {
-      const updatedImages = prev.filter((img) => img.id !== imageId)
+      const updatedImages = prev.filter((img) => img.id !== imageId);
 
-      const imageToRemove = prev.find((img) => img.id === imageId)
+      const imageToRemove = prev.find((img) => img.id === imageId);
       if (imageToRemove) {
-        URL.revokeObjectURL(imageToRemove.previewUrl)
+        URL.revokeObjectURL(imageToRemove.previewUrl);
       }
 
-      return updatedImages
-    })
-  }
+      return updatedImages;
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (isOverLimit || (!comment.trim() && images.length === 0) || isSubmitting) return
+    if (isOverLimit || (!comment.trim() && images.length === 0) || isSubmitting) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const imageFiles = images.map((img) => img.file)
+      const imageFiles = images.map((img) => img.file);
 
       // Call createComment with the correct parameter structure
       await createComment({
         postReference: postId,
         content: comment,
         images: imageFiles.length > 0 ? imageFiles : undefined,
-      })
+      });
 
-      setComment("")
-      setImages([])
-      router.refresh()
+      setComment("");
+      setImages([]);
+      router.refresh();
     } catch (error) {
-      console.error("Error creating comment:", error)
+      console.error("Error creating comment:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const gridImages = images.map((img) => ({
     id: img.id,
     url: img.previewUrl,
     uploading: img.uploading,
     progress: img.progress,
-  }))
+  }));
 
   useEffect(() => {
     return () => {
       images.forEach((image) => {
-        URL.revokeObjectURL(image.previewUrl)
-      })
-    }
-  }, [])
+        URL.revokeObjectURL(image.previewUrl);
+      });
+    };
+  }, []);
 
   return (
     <Card className={`p-4 ${isReply ? "bg-muted/50" : ""}`}>
@@ -169,7 +169,7 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             className={cn(
-              "min-h-[60px] resize-none border-none bg-transparent focus-visible:ring-0 p-0",
+              "min-h-[60px] p-4 resize-none border-none bg-transparent focus-visible:ring-0",
               isOverLimit && "text-destructive",
             )}
           />
@@ -291,5 +291,5 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
         </div>
       </form>
     </Card>
-  )
+  );
 }
