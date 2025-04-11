@@ -62,7 +62,9 @@ export default async function Home() {
       </main>
 
       <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:right-20 md:top-20 md:self-start h-fit">
-        <WhoToFollow user={user} />
+        <Suspense fallback={<WhoToFollowSkeleton />}>
+          <WhoToFollow user={user} />
+        </Suspense>
       </aside>
     </div>
   );
