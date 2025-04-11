@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getRecommendedUsers, type SimpleUserInfo } from "@/users";
 import { FollowButton } from "@/components/follow-button";
 import { checkIfFollowing } from "@/followers";
@@ -67,12 +67,6 @@ export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
           </div>
         ))}
       </CardContent>
-
-      <CardFooter className="p-0">
-        <a href="#" className="block p-5 w-full text-primary hover:bg-muted/40 transition-all border-t">
-          Show more
-        </a>
-      </CardFooter>
     </Card>
   );
 }
