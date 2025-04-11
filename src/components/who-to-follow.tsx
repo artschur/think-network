@@ -6,7 +6,8 @@ import { checkIfFollowing } from "@/followers";
 import { UserPlus } from "lucide-react";
 
 export default async function WhoToFollow({ user }: { user: SimpleUserInfo; }) {
-  const users = await getRecommendedUsers({ userId: user.id });
+  const maxRecommendedUsers = 10;
+  const users = await getRecommendedUsers({ userId: user.id, limit: maxRecommendedUsers });
 
   if (users.length <= 0) {
     return (
