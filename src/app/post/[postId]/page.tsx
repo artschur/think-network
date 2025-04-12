@@ -19,7 +19,7 @@ interface PostPageProps {
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const { postId: postIdString } = await params;
+  const { postId: postIdString } = params;
   const postId = Number.parseInt(postIdString);
 
   if (isNaN(postId)) {
