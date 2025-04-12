@@ -169,7 +169,7 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             className={cn(
-              "min-h-[60px] resize-none border-none bg-transparent focus-visible:ring-0 pt-2 pl-4",
+              "min-h-[60px] resize-none break-all md:break-words border-none bg-blue focus-visible:ring-0 pt-2 pl-4",
               isOverLimit && "text-destructive",
             )}
           />
