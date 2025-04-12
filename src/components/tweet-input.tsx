@@ -260,57 +260,6 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="rounded-full h-8 w-8 text-primary"
-                      >
-                        <BarChart2 className="h-4 w-4" />
-                        <span className="sr-only">Add poll</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">Add poll</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="rounded-full h-8 w-8 text-primary"
-                      >
-                        <Smile className="h-4 w-4" />
-                        <span className="sr-only">Add emoji</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">Add emoji</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="rounded-full h-8 w-8 text-primary"
-                      >
-                        <Calendar className="h-4 w-4" />
-                        <span className="sr-only">Schedule post</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">Schedule post</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
 
               <div className="flex items-center gap-3">
