@@ -14,7 +14,6 @@ export interface CommentWithReplies extends PostResponseWithUser {
 export async function getNestedComments(
   postId: number,
 ): Promise<CommentWithReplies[]> {
-  
   const comments = await db
     .select()
     .from(postsTable)
@@ -34,7 +33,9 @@ export async function getNestedComments(
     };
   };
 
-  const buildTree = (parentId: number): CommentWithReplies[] => {
+  const buildTree = (parentId: number, depth = 1): CommentWithReplies[] => {
+    if (depth > 2) return [];
+
     return comments
       .filter((comment) => comment.postReference === parentId)
       .map((comment) => {
@@ -43,7 +44,7 @@ export async function getNestedComments(
           post: comment,
           images: postImages.map(({ id, publicUrl }) => ({ id, publicUrl })),
           user: getUserData(comment.userId),
-          replies: buildTree(comment.id),
+          replies: buildTree(comment.id, depth + 1),
         };
       });
   };
