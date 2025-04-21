@@ -74,7 +74,7 @@ export default function Tweet({
     })) || [];
 
   return (
-    <Card className="w-full max-w-md md:min-w-full overflow-hidden">
+    <Card className="w-full md:min-w-full overflow-hidden">
       <CardContent className="p-4">
         <div className="grid grid-cols-[auto_1fr] gap-3">
           {/* Avatar */}
