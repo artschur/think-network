@@ -39,7 +39,7 @@ export default async function PostPage({ params }: PostPageProps) {
   };
 
   return (
-    <div className="flex w-full">
+    <div className="flex md:grid md:grid-cols-[1fr] lg:grid-cols-[1fr_3fr_1fr] lg:gap-5 w-full">
       {/* Left sidebar - empty placeholder for balance */}
       <div className="hidden md:block md:w-72 shrink-0"></div>
 
@@ -60,7 +60,7 @@ export default async function PostPage({ params }: PostPageProps) {
       </main>
 
       {/* Right sidebar - hidden on mobile, sticky position on desktop */}
-      <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:top-20 md:self-start h-fit">
+      <aside className="hidden lg:block md:w-72 shrink-0 md:sticky md:top-20 md:self-start h-fit">
         <Suspense fallback={<WhoToFollowSkeleton />}>
           <WhoToFollowWrapper user={user} />
         </Suspense>
