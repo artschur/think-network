@@ -4,7 +4,7 @@ import { clerkClient, db } from './db';
 import { imagesTable, postsTable } from './db/schema';
 import { auth } from '@clerk/nextjs/server';
 import { uploadPostImages } from './images';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { PostResponseWithUser } from './posts';
 
 export interface CommentWithReplies extends PostResponseWithUser {
@@ -66,17 +66,24 @@ export async function createComment({
   if (!userId) throw new Error('You need to be authenticated to comment.');
 
   try {
-    const { id } = (
-      await db
-        .insert(postsTable)
-        .values({
-          userId,
-          postReference,
-          content,
-          isComment: true,
-        })
-        .returning({ id: postsTable.id })
-    )[0];
+    const addCommentCountPromise = db
+      .update(postsTable)
+      .set({ commentCount: sql`${postsTable.commentCount} + 1` })
+      .where(eq(postsTable.id, postReference));
+
+    const insertCommentPromise = db
+      .insert(postsTable)
+      .values({
+        userId,
+        postReference,
+        content,
+        isComment: true,
+      })
+      .returning({ id: postsTable.id });
+
+    const [_, commentResult] = await Promise.all([addCommentCountPromise, insertCommentPromise]);
+
+    const id = commentResult[0]?.id;
 
     if (!id) throw new Error('Error creating comment');
 
