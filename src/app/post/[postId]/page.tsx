@@ -70,7 +70,6 @@ async function PostContent({ postId, user }: { postId: number; user: SimpleUserI
   }
 
   const comments = await getNestedComments(postId);
-
   return (
     <div className="space-y-6">
       <PostDetail post={post} loggedUser={user} />

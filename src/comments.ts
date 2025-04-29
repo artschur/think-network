@@ -11,17 +11,15 @@ export interface CommentWithReplies extends PostResponseWithUser {
   replies: CommentWithReplies[];
 }
 
-export async function getNestedComments(
-  postId: number,
-): Promise<CommentWithReplies[]> {
-  
-  const comments = await db
-    .select()
-    .from(postsTable)
-    .where(eq(postsTable.isComment, true));
+export async function getNestedComments(postId: number): Promise<CommentWithReplies[]> {
+  const postIdNum = Number(postId);
+
+  const allComments = await db.select().from(postsTable).where(eq(postsTable.isComment, true));
+
+  allComments.forEach((comment) => {});
 
   const images = await db.select().from(imagesTable);
-  const userIds = [...new Set(comments.map((c) => c.userId))];
+  const userIds = [...new Set(allComments.map((c) => c.userId))];
   const users = (await clerkClient.users.getUserList({ userId: userIds })).data;
 
   const getUserData = (userId: string) => {
@@ -35,20 +33,24 @@ export async function getNestedComments(
   };
 
   const buildTree = (parentId: number): CommentWithReplies[] => {
-    return comments
-      .filter((comment) => comment.postReference === parentId)
-      .map((comment) => {
-        const postImages = images.filter((img) => img.postId === comment.id);
-        return {
-          post: comment,
-          images: postImages.map(({ id, publicUrl }) => ({ id, publicUrl })),
-          user: getUserData(comment.userId),
-          replies: buildTree(comment.id),
-        };
-      });
+    const parentIdNum = Number(parentId);
+
+    const matchingComments = allComments.filter(
+      (comment) => Number(comment.postReference) === parentIdNum,
+    );
+
+    return matchingComments.map((comment) => {
+      const postImages = images.filter((img) => img.postId === comment.id);
+      return {
+        post: comment,
+        images: postImages.map(({ id, publicUrl }) => ({ id, publicUrl })),
+        user: getUserData(comment.userId),
+        replies: buildTree(comment.id),
+      };
+    });
   };
 
-  return buildTree(postId);
+  return buildTree(postIdNum);
 }
 
 export async function createComment({
