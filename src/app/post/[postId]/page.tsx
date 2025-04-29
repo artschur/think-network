@@ -1,34 +1,27 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { MessageCircle } from "lucide-react";
-import { currentUser } from "@clerk/nextjs/server";
-import type { SimpleUserInfo } from "@/users";
-import PostDetail from "@/components/post-detail";
-import CommentSection from "@/components/comment-section";
-import CommentInput from "@/components/comment-input";
-import { getPostById } from "@/posts";
-import { getNestedComments } from "@/comments";
-import WhoToFollowWrapper from "@/components/who-to-follow-wrapper";
+import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { MessageCircle } from 'lucide-react';
+import { currentUser } from '@clerk/nextjs/server';
+import type { SimpleUserInfo } from '@/users';
+import PostDetail from '@/components/post-detail';
+import CommentSection from '@/components/comment-section';
+import CommentInput from '@/components/comment-input';
+import { getPostById } from '@/posts';
+import { getNestedComments } from '@/comments';
+import WhoToFollowWrapper from '@/components/who-to-follow-wrapper';
 
-interface PostPageProps {
-  params: {
-    postId: string;
-  };
-}
+export default async function PostPage({ params }: { params: Promise<{ postId: number }> }) {
+  let { postId } = await params;
 
-export default async function PostPage({ params }: PostPageProps) {
-  const { postId: postIdString } = params;
-  const postId = Number.parseInt(postIdString);
-
-  if (isNaN(postId)) {
+  if (!postId) {
     notFound();
   }
 
   const response = await currentUser();
   if (!response) {
-    throw new Error("User not authenticated");
+    throw new Error('User not authenticated');
   }
 
   const user: SimpleUserInfo = {
@@ -69,7 +62,7 @@ export default async function PostPage({ params }: PostPageProps) {
   );
 }
 
-async function PostContent({ postId, user }: { postId: number; user: SimpleUserInfo; }) {
+async function PostContent({ postId, user }: { postId: number; user: SimpleUserInfo }) {
   const post = await getPostById({ postId });
 
   if (!post) {

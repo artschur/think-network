@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import type React from "react";
-import { useState, useRef, useEffect } from "react";
-import { ImagePlus, Smile, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { SimpleUserInfo } from "@/users";
-import { cn } from "@/lib/utils";
-import { createComment } from "@/comments";
-import { useRouter } from "next/navigation";
-import ImageGrid from "./image-grid";
+import type React from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { ImagePlus, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { SimpleUserInfo } from '@/users';
+import { cn } from '@/lib/utils';
+import { createComment } from '@/comments';
+import { useRouter } from 'next/navigation';
+import ImageGrid from './image-grid';
 
 const MAX_COMMENT_LENGTH = 280;
 const MAX_IMAGES = 4;
@@ -33,7 +33,7 @@ interface CommentInputProps {
 }
 
 export default function CommentInput({ postId, user, isReply = false }: CommentInputProps) {
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<UploadingImage[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -42,7 +42,7 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [comment]);
@@ -74,7 +74,7 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
     setImages((prev) => [...prev, ...newImages]);
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
 
     newImages.forEach((image) => {
@@ -83,7 +83,9 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
   };
 
   const simulateImageUpload = (imageId: string) => {
-    setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, uploading: true } : img)));
+    setImages((prev) =>
+      prev.map((img) => (img.id === imageId ? { ...img, uploading: true } : img)),
+    );
 
     let progress = 0;
     const interval = setInterval(() => {
@@ -93,7 +95,9 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
         clearInterval(interval);
         progress = 100;
 
-        setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, progress, uploading: false } : img)));
+        setImages((prev) =>
+          prev.map((img) => (img.id === imageId ? { ...img, progress, uploading: false } : img)),
+        );
       } else {
         setImages((prev) => prev.map((img) => (img.id === imageId ? { ...img, progress } : img)));
       }
@@ -129,11 +133,11 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
         images: imageFiles.length > 0 ? imageFiles : undefined,
       });
 
-      setComment("");
+      setComment('');
       setImages([]);
       router.refresh();
     } catch (error) {
-      console.error("Error creating comment:", error);
+      console.error('Error creating comment:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -155,26 +159,28 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
   }, []);
 
   return (
-    <Card className={`p-4 ${isReply ? "bg-muted/50" : ""}`}>
+    <Card className={`p-4 ${isReply ? 'bg-muted/50' : ''}`}>
       <form className="flex gap-3" onSubmit={handleSubmit}>
-        <Avatar className={isReply ? "h-8 w-8" : "h-10 w-10"}>
-          <AvatarImage src={user.imageUrl} alt={user.fullName || ""} />
-          <AvatarFallback>{user?.fullName?.[0] || user?.username?.[0] || "U"}</AvatarFallback>
+        <Avatar className={isReply ? 'h-8 w-8' : 'h-10 w-10'}>
+          <AvatarImage src={user.imageUrl} alt={user.fullName || ''} />
+          <AvatarFallback>{user?.fullName?.[0] || user?.username?.[0] || 'U'}</AvatarFallback>
         </Avatar>
 
         <div className="flex-1 space-y-3">
           <Textarea
             ref={textareaRef}
-            placeholder={isReply ? "Write a reply..." : "Add a comment..."}
+            placeholder={isReply ? 'Write a reply...' : 'Add a comment...'}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             className={cn(
-              "min-h-[60px] resize-none break-all md:break-words border-none bg-blue focus-visible:ring-0 pt-2 pl-4",
-              isOverLimit && "text-destructive",
+              'min-h-[60px] resize-none break-all md:break-words border-none bg-blue focus-visible:ring-0 pt-2 pl-4',
+              isOverLimit && 'text-destructive',
             )}
           />
 
-          {images.length > 0 && <ImageGrid images={gridImages} editable={true} onRemove={removeImage} />}
+          {images.length > 0 && (
+            <ImageGrid images={gridImages} editable={true} onRemove={removeImage} />
+          )}
 
           <div className="flex justify-between items-center">
             <div className="flex gap-1">
@@ -195,8 +201,10 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
                       variant="ghost"
                       size="icon"
                       className={cn(
-                        "rounded-full h-8 w-8 cursor-pointer",
-                        canAddMoreImages ? "text-primary" : "text-muted-foreground cursor-not-allowed",
+                        'rounded-full h-8 w-8 cursor-pointer',
+                        canAddMoreImages
+                          ? 'text-primary'
+                          : 'text-muted-foreground cursor-not-allowed',
                       )}
                       onClick={handleImageClick}
                       disabled={!canAddMoreImages}
@@ -206,7 +214,7 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    {canAddMoreImages ? "Add image" : `Maximum ${MAX_IMAGES} images`}
+                    {canAddMoreImages ? 'Add image' : `Maximum ${MAX_IMAGES} images`}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -227,12 +235,12 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
                     />
                     <circle
                       className={cn(
-                        "transition-all",
+                        'transition-all',
                         remainingChars > 20
-                          ? "text-primary"
+                          ? 'text-primary'
                           : remainingChars > 0
-                            ? "text-amber-500"
-                            : "text-destructive",
+                            ? 'text-amber-500'
+                            : 'text-destructive',
                       )}
                       cx="12"
                       cy="12"
@@ -247,12 +255,12 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
                   </svg>
                   <span
                     className={cn(
-                      "absolute text-xs font-medium",
+                      'absolute text-xs font-medium',
                       remainingChars <= 20 && remainingChars > 0
-                        ? "text-amber-500"
+                        ? 'text-amber-500'
                         : remainingChars < 0
-                          ? "text-destructive"
-                          : "",
+                          ? 'text-destructive'
+                          : '',
                     )}
                   >
                     {Math.abs(remainingChars)}
@@ -262,7 +270,7 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
 
               <Button
                 type="submit"
-                size={isReply ? "sm" : "default"}
+                size={isReply ? 'sm' : 'default'}
                 className="rounded-full cursor-pointer"
                 disabled={
                   isOverLimit ||
@@ -272,7 +280,7 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
                 }
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                {isSubmitting ? "Posting..." : isReply ? "Reply" : "Comment"}
+                {isSubmitting ? 'Posting...' : isReply ? 'Reply' : 'Comment'}
               </Button>
             </div>
           </div>
