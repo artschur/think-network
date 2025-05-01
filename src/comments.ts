@@ -11,12 +11,14 @@ export interface CommentWithReplies extends PostResponseWithUser {
   replies: CommentWithReplies[];
 }
 
+
 export async function getNestedComments(postId: number): Promise<CommentWithReplies[]> {
   const postIdNum = Number(postId);
 
   const allComments = await db.select().from(postsTable).where(eq(postsTable.isComment, true));
 
   allComments.forEach((comment) => {});
+
 
   const images = await db.select().from(imagesTable);
   const userIds = [...new Set(allComments.map((c) => c.userId))];
@@ -31,6 +33,7 @@ export async function getNestedComments(postId: number): Promise<CommentWithRepl
       profileImageUrl: user?.imageUrl || '',
     };
   };
+
 
   const buildTree = (parentId: number): CommentWithReplies[] => {
     const parentIdNum = Number(parentId);
@@ -48,6 +51,7 @@ export async function getNestedComments(postId: number): Promise<CommentWithRepl
         replies: buildTree(comment.id),
       };
     });
+
   };
 
   return buildTree(postIdNum);

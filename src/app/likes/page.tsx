@@ -24,10 +24,9 @@ export default async function LikesPage() {
 
   return (
     <div className="flex w-full">
-      {/* Left sidebar - empty placeholder for balance */}
+      
       <div className="hidden md:block md:w-72 shrink-0"></div>
 
-      {/* Main content - centered and with max width */}
       <main className="flex-1 flex flex-col items-center">
         <div className="w-full max-w-xl mx-auto">
           <Card className="top-10 z-10 mb-6 border-b">
@@ -43,7 +42,6 @@ export default async function LikesPage() {
         </div>
       </main>
 
-      {/* Right sidebar - hidden on mobile, sticky position on desktop */}
       <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:top-20 md:self-start h-fit">
         <div className="space-y-6">
           <div className="relative">

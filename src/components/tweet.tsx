@@ -85,9 +85,8 @@ export default function Tweet({
             </Avatar>
           </div>
 
-          {/* Content area */}
-          <div className="min-w-0"> {/* min-w-0 prevents overflow */}
-            {/* User info and date */}
+          <div className="min-w-0">
+            
             <div className="flex justify-between items-start mb-1">
               <div className="flex flex-wrap items-center gap-x-1 min-w-0 pr-2">
                 <span className="font-medium text-foreground truncate">
@@ -112,19 +111,16 @@ export default function Tweet({
               </Link>
             </div>
 
-            {/* Tweet content */}
             <div className="text-sm text-foreground mb-2 break-words whitespace-pre-wrap">
               {tweet.post.content}
             </div>
 
-            {/* Images container with proper containment */}
             {gridImages.length > 0 && (
               <div className="w-full mb-3 overflow-hidden">
                 <ImageGrid images={gridImages} />
               </div>
             )}
 
-            {/* Action buttons */}
             <div className="flex justify-between items-center mt-2">
               <Link href={`/post/${tweet.post.id}`}>
                 <Button

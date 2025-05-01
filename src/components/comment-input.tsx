@@ -126,7 +126,6 @@ export default function CommentInput({ postId, user, isReply = false }: CommentI
     try {
       const imageFiles = images.map((img) => img.file);
 
-      // Call createComment with the correct parameter structure
       await createComment({
         postReference: postId,
         content: comment,
