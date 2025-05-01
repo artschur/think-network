@@ -23,8 +23,8 @@ export default async function Home() {
   };
 
   return (
-    <div className="flex w-full">
-      <div className="hidden md:block md:w-72 shrink-0"></div>
+    <div className="flex md:grid md:grid-cols-[1fr] lg:grid-cols-[1fr_3fr_1fr] lg:gap-5 w-full">
+      <div className="hidden lg:block md:w-72 shrink-0"></div>
 
       <main className="flex-1 flex flex-col items-center">
         <div className="w-full max-w-xl mx-auto">
@@ -59,7 +59,7 @@ export default async function Home() {
         </div>
       </main>
 
-      <aside className="hidden md:block md:w-72 shrink-0 md:sticky md:right-20 md:top-20 md:self-start h-fit">
+      <aside className="hidden lg:block md:w-72 shrink-0 md:sticky md:top-20 md:self-start h-fit">
         <Suspense fallback={<WhoToFollowSkeleton />}>
           <WhoToFollowWrapper user={user} />
         </Suspense>

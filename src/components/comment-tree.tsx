@@ -86,7 +86,7 @@ export default function CommentTree({ comment, loggedUser, isTopLevel = false }:
   return (
     <Card
       id={`comment-${post.id}`}
-      className={`overflow-hidden ${isTopLevel ? "" : "ml-6 mt-3 border-l-4 border-l-gray-100 dark:border-l-gray-800"}`}
+      className={`overflow-hidden ${isTopLevel ? "" : "mt-3 dark:border-l-gray-800"}`}
     >
       <CardContent className="p-4">
         <div className="flex gap-3">

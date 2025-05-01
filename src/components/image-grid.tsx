@@ -31,9 +31,7 @@ export default function ImageGrid({
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   if (images.length === 0) return null;
-  console.log(images);
   const openPreview = (image: GridImage, index: number) => {
-    
     if (!image.uploading) {
       setSelectedImage(image);
       setSelectedIndex(index);
@@ -54,7 +52,6 @@ export default function ImageGrid({
     }
   };
 
-  
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;

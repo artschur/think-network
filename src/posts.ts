@@ -45,7 +45,11 @@ export async function getSinglePost({ postId }: { postId: number }) {
       .select()
       .from(postsTable)
       .where(and(eq(postsTable.id, postId), eq(postsTable.isComment, false))),
-    db.select().from(imagesTable).where(eq(imagesTable.postId, postId)),
+
+    db
+    .select()
+    .from(imagesTable)
+    .where(eq(imagesTable.postId, postId)),
   ]);
 
   const post = posts[0];

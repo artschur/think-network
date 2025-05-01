@@ -74,7 +74,7 @@ export default function Tweet({
     })) || [];
 
   return (
-    <Card className="w-full max-w-md md:min-w-full overflow-hidden">
+    <Card className="w-full md:min-w-full overflow-hidden">
       <CardContent className="p-4">
         <div className="grid grid-cols-[auto_1fr] gap-3">
           {/* Avatar */}
@@ -126,7 +126,7 @@ export default function Tweet({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  className="h-8 cursor-pointer rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
                 >
                   <MessageCircle className="h-4 w-4" />
                   <span className="text-xs">{tweet.post.commentCount}</span>
