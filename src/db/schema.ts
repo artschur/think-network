@@ -1,11 +1,4 @@
-import {
-  boolean,
-  index,
-  integer,
-  pgTable,
-  timestamp,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { boolean, index, integer, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { supabase } from '.';
 
 export const postsTable = pgTable(

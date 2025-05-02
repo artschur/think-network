@@ -2,10 +2,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Separator } from "@/components/ui/separator"
 
 async function getTrendingTopics() {
-  // Simulate network delay
+  
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
-  // Mock data
   return [
     { id: 1, category: "Technology", name: "Next.js 15", tweets: "125K" },
     { id: 2, category: "Sports", name: "#WorldCup", tweets: "95K" },

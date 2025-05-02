@@ -65,7 +65,7 @@ export default function Tweet({
     })) || [];
 
   return (
-    <Card className="w-full max-w-md md:min-w-full overflow-hidden">
+    <Card className="w-full md:min-w-full overflow-hidden">
       <CardContent className="p-4">
         <div className="grid grid-cols-[auto_1fr] gap-3">
           
@@ -76,7 +76,10 @@ export default function Tweet({
             </Avatar>
           </Link>
 
+<<<<<<< HEAD
           
+=======
+>>>>>>> origin/main
           <div className="min-w-0">
             
             <div className="flex justify-between items-start mb-1">
@@ -111,25 +114,35 @@ export default function Tweet({
               </Link>
             </div>
 
+<<<<<<< HEAD
             
+=======
+>>>>>>> origin/main
             <div className="text-sm text-foreground mb-2 break-words whitespace-pre-wrap">
               {tweet.post.content}
             </div>
 
+<<<<<<< HEAD
             
+=======
+>>>>>>> origin/main
             {gridImages.length > 0 && (
               <div className="w-full mb-3 overflow-hidden">
                 <ImageGrid images={gridImages} />
               </div>
             )}
 
+<<<<<<< HEAD
             
             <div className="flex justify-between items-center mt-2 max-w-md">
+=======
+            <div className="flex justify-between items-center mt-2">
+>>>>>>> origin/main
               <Link href={`/post/${tweet.post.id}`}>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  className="h-8 cursor-pointer rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
                 >
                   <MessageCircle className="h-4 w-4" />
                   <span className="text-xs">{tweet.post.commentCount}</span>

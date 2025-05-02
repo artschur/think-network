@@ -31,9 +31,7 @@ export default function ImageGrid({
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   if (images.length === 0) return null;
-  console.log(images);
   const openPreview = (image: GridImage, index: number) => {
-    
     if (!image.uploading) {
       setSelectedImage(image);
       setSelectedIndex(index);
@@ -54,7 +52,6 @@ export default function ImageGrid({
     }
   };
 
-  
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;
@@ -80,7 +77,6 @@ export default function ImageGrid({
           'grid gap-2 mt-2 rounded-xl overflow-hidden border',
           images.length === 1 && 'grid-cols-1',
           images.length === 2 && 'grid-cols-2',
-          // For 3 images, use a different layout approach
           images.length === 3 && 'grid-cols-2 grid-rows-2 h-[320px]',
           images.length === 4 && 'grid-cols-2',
           className,
@@ -119,7 +115,7 @@ export default function ImageGrid({
                 variant="secondary"
                 className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/50 hover:bg-black/70 text-white opacity-0 group-hover:opacity-100 transition-opacity z-10"
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent opening preview when removing
+                  e.stopPropagation();
                   onRemove(image.id);
                 }}
               >
