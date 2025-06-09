@@ -68,7 +68,6 @@ export default function Tweet({
     <Card className="w-full md:min-w-full overflow-hidden">
       <CardContent className="p-4">
         <div className="grid grid-cols-[auto_1fr] gap-3">
-          
           <Link href={`/profile/${tweet.user?.username}`}>
             <Avatar className="h-10 w-10 cursor-pointer hover:opacity-90 transition-opacity">
               <AvatarFallback>{tweet.user?.fullName[0]}</AvatarFallback>
@@ -76,12 +75,7 @@ export default function Tweet({
             </Avatar>
           </Link>
 
-<<<<<<< HEAD
-          
-=======
->>>>>>> origin/main
           <div className="min-w-0">
-            
             <div className="flex justify-between items-start mb-1">
               <div className="flex flex-wrap items-center gap-x-1 min-w-0 pr-2">
                 <Link href={`/profile/${tweet.user?.username}`}>
@@ -104,40 +98,23 @@ export default function Tweet({
                 </span>
               </div>
               <Link href={`/post/${tweet.post.id}`} className="shrink-0">
-                <Button
-                  className="text-neutral-400 h-8 w-8 p-0"
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button className="text-neutral-400 h-8 w-8 p-0" variant="ghost" size="sm">
                   <CircleArrowOutUpRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
 
-<<<<<<< HEAD
-            
-=======
->>>>>>> origin/main
             <div className="text-sm text-foreground mb-2 break-words whitespace-pre-wrap">
               {tweet.post.content}
             </div>
 
-<<<<<<< HEAD
-            
-=======
->>>>>>> origin/main
             {gridImages.length > 0 && (
               <div className="w-full mb-3 overflow-hidden">
                 <ImageGrid images={gridImages} />
               </div>
             )}
 
-<<<<<<< HEAD
-            
-            <div className="flex justify-between items-center mt-2 max-w-md">
-=======
             <div className="flex justify-between items-center mt-2">
->>>>>>> origin/main
               <Link href={`/post/${tweet.post.id}`}>
                 <Button
                   variant="ghost"
@@ -160,17 +137,11 @@ export default function Tweet({
                 )}
                 onClick={handleLike}
               >
-                <Heart
-                  className="h-4 w-4"
-                  fill={liked ? 'currentColor' : 'none'}
-                />
+                <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} />
                 <span className="text-xs">{likeCount}</span>
               </Button>
 
-              <ShareButton
-                loggedUserId={loggedUser.id}
-                postUserId={tweet.user.id}
-              />
+              <ShareButton loggedUserId={loggedUser.id} postUserId={tweet.user.id} />
             </div>
           </div>
         </div>
