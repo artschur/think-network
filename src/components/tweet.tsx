@@ -26,7 +26,7 @@ interface PostResponseWithUser {
     username: string;
     profileImageUrl: string;
   };
-  images?: { publicUrl: string; }[];
+  images?: { publicUrl: string }[];
 }
 
 export default function Tweet({
@@ -50,21 +50,12 @@ export default function Tweet({
     setLiked(newLikedState);
     setLikeCount(newLikedState ? likeCount + 1 : likeCount - 1);
 
-    if (newLikedState) {
-      likePost({ loggedUserId: loggedUser.id, postId: tweet.post.id }).catch(
-        () => {
-          setLiked(false);
-          setLikeCount(likeCount);
-        },
-      );
-    } else {
-      unlikePost({ loggedUserId: loggedUser.id, postId: tweet.post.id }).catch(
-        () => {
-          setLiked(true);
-          setLikeCount(likeCount);
-        },
-      );
-    }
+    const likeAction = newLikedState ? likePost : unlikePost;
+
+    likeAction({ loggedUserId: loggedUser.id, postId: tweet.post.id }).catch(() => {
+      setLiked(!newLikedState);
+      setLikeCount(likeCount);
+    });
   };
 
   const gridImages: GridImage[] =
@@ -77,35 +68,37 @@ export default function Tweet({
     <Card className="w-full md:min-w-full overflow-hidden">
       <CardContent className="p-4">
         <div className="grid grid-cols-[auto_1fr] gap-3">
-          {/* Avatar */}
-          <div>
-            <Avatar className="h-10 w-10">
+          <Link href={`/profile/${tweet.user?.username}`}>
+            <Avatar className="h-10 w-10 cursor-pointer hover:opacity-90 transition-opacity">
               <AvatarFallback>{tweet.user?.fullName[0]}</AvatarFallback>
               <AvatarImage src={tweet.user?.profileImageUrl} />
             </Avatar>
-          </div>
+          </Link>
 
           <div className="min-w-0">
-            
             <div className="flex justify-between items-start mb-1">
               <div className="flex flex-wrap items-center gap-x-1 min-w-0 pr-2">
-                <span className="font-medium text-foreground truncate">
-                  {tweet.user?.fullName}
-                </span>
-                <span className="text-muted-foreground text-sm truncate">
-                  @{tweet.user?.username}
-                </span>
+                <Link href={`/profile/${tweet.user?.username}`}>
+                  <span className="font-medium text-foreground truncate hover:text-primary hover:underline">
+                    {tweet.user?.fullName}
+                  </span>
+                </Link>
+                <Link href={`/profile/${tweet.user?.username}`}>
+                  <span className="text-muted-foreground text-sm truncate hover:underline">
+                    @{tweet.user?.username}
+                  </span>
+                </Link>
                 <span className="text-muted-foreground mx-0.5 hidden sm:inline">·</span>
-                <span className="text-muted-foreground text-sm truncate hidden sm:inline">
-                  {new Date(tweet.post.createdAt).toLocaleDateString()}
+                <span className="text-muted-foreground text-sm truncate hidden sm:inline hover:text-primary transition-colors">
+                  {new Date(tweet.post.createdAt).toLocaleDateString()} at{' '}
+                  {new Date(tweet.post.createdAt).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
               </div>
               <Link href={`/post/${tweet.post.id}`} className="shrink-0">
-                <Button
-                  className="text-neutral-400 h-8 w-8 p-0"
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button className="text-neutral-400 h-8 w-8 p-0" variant="ghost" size="sm">
                   <CircleArrowOutUpRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -144,10 +137,7 @@ export default function Tweet({
                 )}
                 onClick={handleLike}
               >
-                <Heart
-                  className="h-4 w-4"
-                  fill={liked ? 'currentColor' : 'none'}
-                />
+                <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} />
                 <span className="text-xs">{likeCount}</span>
               </Button>
 

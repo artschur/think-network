@@ -17,7 +17,7 @@ A proposta do nosso projeto é oferecer uma experiência de rede social simples,
 ## Participantes
 
 - Arthur Schurhaus
-- Estefano Gerassi Tuyama
+- Estéfano Tuyama Gerassi
 - Gean Pereira
 - Rafael Vieira Ferreira
 - Tom Sales Soares de Camargo

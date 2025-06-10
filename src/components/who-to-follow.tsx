@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
@@ -54,8 +55,11 @@ export default function WhoToFollow({
             key={recommendedUser.id}
             className="px-5 py-4 hover:bg-muted/30 transition-all duration-200 flex items-center justify-between group"
           >
-            <div className="flex items-center gap-3">
-              <Avatar className="ring-2 ring-primary/10 shadow-md border border-border/50 transition-all duration-300 group-hover:ring-primary/30">
+            <Link
+              href={`/profile/${recommendedUser.username}`}
+              className="flex items-center gap-3"
+            >
+              <Avatar className="ring-2 ring-primary/10 shadow-md border border-border/50 transition-all duration-300 group-hover:ring-primary/30 hover:opacity-90">
                 <AvatarFallback className="bg-gradient-to-br from-muted to-muted/70 text-foreground/80">
                   {recommendedUser.username?.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
@@ -63,12 +67,12 @@ export default function WhoToFollow({
               </Avatar>
 
               <div className="transition-all duration-200 max-w-[95px]">
-                <div className="font-medium group-hover:text-primary transition-colors duration-200 truncate">
+                <div className="font-medium group-hover:text-primary hover:underline transition-colors duration-200 truncate">
                   {recommendedUser.fullName}
                 </div>
                 <div className="text-sm text-muted-foreground truncate">@{recommendedUser.username}</div>
               </div>
-            </div>
+            </Link>
 
             <FollowButton
               userId={recommendedUser.userId}
