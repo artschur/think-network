@@ -82,7 +82,7 @@ async function getProfileData(userId: string, currentUserId: string): Promise<Pr
   };
 }
 
-function ProfileContent({ data }: { data: ProfileData }) {
+function ProfileContent({ data }: { data: ProfileData; }) {
   const { user, tweets, followingCount, followersCount, isCurrentUser } = data;
 
   return (
@@ -226,16 +226,20 @@ function ProfileSkeleton() {
   );
 }
 
-export default async function ProfilePage({ params }: { params: { username: string } }) {
+export default async function ProfilePage({ params }: { params: Promise<{ username: string; }>; }) {
+
   const currentUserData = await currentUser();
   if (!currentUserData) {
     notFound();
   }
 
-  const profileUser = await getUserByUsername(params.username);
+  const { username } = await params;
+  const profileUser = await getUserByUsername(username);
   if (!profileUser) {
     notFound();
   }
+
+
 
   return (
     <Suspense fallback={<ProfileSkeleton />}>
