@@ -48,7 +48,6 @@ async function getUserByUsername(username: string) {
 }
 
 async function getProfileData(userId: string, currentUserId: string): Promise<ProfileData> {
-  // Fetch all data in parallel
   const [user, posts, followingCount, followersCount] = await Promise.all([
     clerkClient.users.getUser(userId),
     getPostsByUserId({ userId }),
