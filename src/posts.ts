@@ -1,7 +1,7 @@
 'use server';
 
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
-import { db, clerkClient } from './db';
+import { db, clerkClient, supabase } from './db';
 import {
   followersTable,
   imagesTable,
@@ -11,8 +11,9 @@ import {
 } from './db/schema';
 import { auth } from '@clerk/nextjs/server';
 import { CreatePostInterface } from './interfaces';
-import { uploadPostImages } from './images';
+import { deletePostImages, uploadPostImages } from './images';
 import { getUserByPost } from './users';
+
 interface PostImages {
   id: number;
   publicUrl: string;
@@ -281,4 +282,46 @@ export async function getPostById({
       profileImageUrl: user.imageUrl || '',
     },
   };
+}
+
+export async function deletePost({ postId }: { postId: number }) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Not authenticated');
+
+  const post = (
+    await db.select().from(postsTable).where(eq(postsTable.id, postId))
+  )[0];
+
+  if (!post) throw new Error('Post not found');
+  if (post.userId !== userId) throw new Error('Not authorized');
+  if (post.isComment) throw new Error('Cannot delete a comment with this function');
+
+  const comments = await db
+    .select({ id: postsTable.id })
+    .from(postsTable)
+    .where(eq(postsTable.postReference, postId))
+    .limit(1);
+
+  if (comments.length > 0) {
+    await deletePostImages({ postId });
+    await db
+      .update(postsTable)
+      .set({
+        content: '[this post was deleted by its author]',
+      })
+      .where(eq(postsTable.id, postId));
+  } else {
+    const images = await db
+      .select({ storagePath: imagesTable.storagePath })
+      .from(imagesTable)
+      .where(eq(imagesTable.postId, postId));
+
+    if (images.length > 0) {
+      const paths = images.map((i) => i.storagePath);
+      await supabase.storage.from('media').remove(paths);
+    }
+    await db.delete(postsTable).where(eq(postsTable.id, postId));
+  }
+
+  return { success: true };
 }

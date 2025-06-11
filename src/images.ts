@@ -5,6 +5,7 @@ import { UploadImageTemporary } from './interfaces';
 import { supabase } from './db';
 import { db } from './db';
 import { imagesTable } from './db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function uploadPostImages({
   postId,
@@ -52,4 +53,24 @@ export async function uploadPostImages({
   return {
     publicUrls: imagesToInsert.map((image) => image.publicUrl),
   };
+}
+
+export async function deletePostImages({ postId }: { postId: number }) {
+  const images = await db
+    .select({ storagePath: imagesTable.storagePath })
+    .from(imagesTable)
+    .where(eq(imagesTable.postId, postId));
+
+  if (images.length === 0) {
+    return;
+  }
+
+  const paths = images.map((img) => img.storagePath);
+  const { error } = await supabase.storage.from('media').remove(paths);
+
+  if (error) {
+    console.error('Error deleting images from storage:', error);
+  }
+
+  await db.delete(imagesTable).where(eq(imagesTable.postId, postId));
 }
