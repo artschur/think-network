@@ -40,10 +40,12 @@ export default function Tweet({
   const [likeCount, setLikeCount] = useState(tweet.post.likeCount);
 
   useEffect(() => {
+    if (tweet.post.content.startsWith('[this')) return;
+
     checkIfLiked({ loggedUserId: loggedUser.id, postId: tweet.post.id })
       .then((isLiked) => setLiked(isLiked))
       .catch((err) => console.error('Failed to check like status:', err));
-  }, [loggedUser.id, tweet.post.id]);
+  }, [loggedUser.id, tweet.post.id, tweet.post.content]);
 
   const handleLike = () => {
     const newLikedState = !liked;
@@ -63,6 +65,8 @@ export default function Tweet({
       id: `tweet-${tweet.post.id}-image-${index}`,
       url: img.publicUrl || '/placeholder.svg',
     })) || [];
+
+  const isDeleted = tweet.post.content.startsWith('[this');
 
   return (
     <Card className="w-full md:min-w-full overflow-hidden">
@@ -104,7 +108,10 @@ export default function Tweet({
               </Link>
             </div>
 
-            <div className="text-sm text-foreground mb-2 break-words whitespace-pre-wrap">
+            <div className={cn(
+              "text-sm text-foreground mb-2 break-words whitespace-pre-wrap",
+              isDeleted && "italic text-muted-foreground"
+            )}>
               {tweet.post.content}
             </div>
 
@@ -114,35 +121,37 @@ export default function Tweet({
               </div>
             )}
 
-            <div className="flex justify-between items-center mt-2">
-              <Link href={`/post/${tweet.post.id}`}>
+            {!isDeleted && (
+              <div className="flex justify-between items-center mt-2">
+                <Link href={`/post/${tweet.post.id}`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 cursor-pointer rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    <span className="text-xs">{tweet.post.commentCount}</span>
+                  </Button>
+                </Link>
+
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 cursor-pointer rounded-full flex items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  className={cn(
+                    'h-8 rounded-full flex items-center gap-1',
+                    liked
+                      ? 'text-destructive hover:text-destructive hover:bg-destructive/10'
+                      : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
+                  )}
+                  onClick={handleLike}
                 >
-                  <MessageCircle className="h-4 w-4" />
-                  <span className="text-xs">{tweet.post.commentCount}</span>
+                  <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} />
+                  <span className="text-xs">{likeCount}</span>
                 </Button>
-              </Link>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  'h-8 rounded-full flex items-center gap-1',
-                  liked
-                    ? 'text-destructive hover:text-destructive hover:bg-destructive/10'
-                    : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
-                )}
-                onClick={handleLike}
-              >
-                <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} />
-                <span className="text-xs">{likeCount}</span>
-              </Button>
-
-              <ShareButton loggedUserId={loggedUser.id} postUserId={tweet.user.id} />
-            </div>
+                <ShareButton loggedUserId={loggedUser.id} postUserId={tweet.user.id} postId={tweet.post.id} />
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
