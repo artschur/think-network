@@ -1,7 +1,8 @@
 'use server';
 
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql, gte } from 'drizzle-orm';
 import { db, clerkClient, supabase } from './db';
+
 import {
   followersTable,
   imagesTable,
@@ -282,6 +283,55 @@ export async function getPostById({
       profileImageUrl: user.imageUrl || '',
     },
   };
+}
+
+
+export async function getTrendingPosts(): Promise<PostResponseWithUser[]> {
+
+  const aWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const trendingPosts = await db
+    .select({
+      posts: postsTable,
+      images: sql<{ id: number; publicUrl: string }[]>`COALESCE(
+        json_agg(json_build_object('id', ${imagesTable.id}, 'publicUrl', ${imagesTable.publicUrl})) FILTER (WHERE ${imagesTable.id} IS NOT NULL),
+        '[]'::json
+      )`.as('images'),
+    })
+    .from(postsTable)
+    .leftJoin(imagesTable, eq(imagesTable.postId, postsTable.id))
+    .where(
+      and(
+        eq(postsTable.isComment, false),
+        gte(postsTable.createdAt, aWeekAgo)
+      )
+    )
+    .groupBy(postsTable.id)
+    .orderBy(desc(postsTable.likeCount))
+    .limit(10); // Pega o Top 10
+
+  if (trendingPosts.length === 0) {
+    return [];
+  }
+
+  const userIds = [...new Set(trendingPosts.map((p) => p.posts.userId))];
+  const users = (await clerkClient.users.getUserList({ userId: userIds })).data;
+
+  return trendingPosts.map((post) => {
+    const user = users.find((u) => u.id === post.posts.userId);
+    if (!user) throw new Error(`User not found for post ${post.posts.id}`);
+
+    return {
+      post: post.posts,
+      images: post.images || [],
+      user: {
+        id: user.id,
+        fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        username: user.username || '',
+        profileImageUrl: user.imageUrl || '',
+      },
+    };
+  });
 }
 
 export async function deletePost({ postId }: { postId: number }) {

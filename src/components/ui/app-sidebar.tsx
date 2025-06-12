@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Heart, Home } from 'lucide-react';
+import { Heart, Home, TrendingUp } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +27,11 @@ const items = [
     title: 'Likes',
     url: '/likes',
     icon: Heart,
+  },
+  {
+    title: "Trending",
+    url: "/trending",
+    icon: TrendingUp,
   },
 ];
 
