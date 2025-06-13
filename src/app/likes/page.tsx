@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import TweetFeed from "@/components/tweet-feed";
+import PostFeed from "@/components/post-feed";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,7 +36,7 @@ export default async function LikesPage() {
             </CardHeader>
           </Card>
 
-          <Suspense fallback={<TweetFeedSkeleton />}>
+          <Suspense fallback={<PostFeedSkeleton />}>
             <LikedFeed loggedUser={user} />
           </Suspense>
         </div>
@@ -59,8 +59,8 @@ export default async function LikesPage() {
 }
 
 async function LikedFeed({ loggedUser }: { loggedUser: SimpleUserInfo; }) {
-  const tweets = await getLikedPostsByUser({ userId: loggedUser.id });
-  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
+  const posts = await getLikedPostsByUser({ userId: loggedUser.id });
+  return <PostFeed posts={posts} loggedUser={loggedUser} />;
 }
 
 function WhoToFollowSkeleton() {
@@ -90,7 +90,7 @@ function WhoToFollowSkeleton() {
   );
 }
 
-function TweetFeedSkeleton() {
+function PostFeedSkeleton() {
   return (
     <div className="space-y-6">
       {Array(5)
