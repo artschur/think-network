@@ -14,7 +14,7 @@ import { createPost } from '@/posts';
 import { useRouter } from 'next/navigation';
 import ImageGrid from './image-grid';
 
-const MAX_TWEET_LENGTH = 280;
+const MAX_POST_LENGTH = 280;
 const MAX_IMAGES = 4;
 
 type UploadingImage = {
@@ -26,8 +26,8 @@ type UploadingImage = {
   error?: string;
 };
 
-export default function TweetInput({ user }: { user: SimpleUserInfo }) {
-  const [tweet, setTweet] = useState('');
+export default function PostInput({ user }: { user: SimpleUserInfo }) {
+  const [post, setPost] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<UploadingImage[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -39,9 +39,9 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
-  }, [tweet]);
+  }, [post]);
 
-  const remainingChars = MAX_TWEET_LENGTH - tweet.length;
+  const remainingChars = MAX_POST_LENGTH - post.length;
   const isOverLimit = remainingChars < 0;
   const canAddMoreImages = images.length < MAX_IMAGES;
 
@@ -114,7 +114,7 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isOverLimit || (!tweet.trim() && images.length === 0) || isSubmitting) return;
+    if (isOverLimit || (!post.trim() && images.length === 0) || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
@@ -123,12 +123,12 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
       await createPost({
         postContent: {
           userId: user.id,
-          content: tweet,
+          content: post,
           images: imageFiles,
         },
       });
 
-      setTweet('');
+      setPost('');
       setImages([]);
       router.refresh();
     } catch (error) {
@@ -174,8 +174,8 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
             <div className="flex flex-col">
               <Textarea
                 ref={textareaRef}
-                value={tweet}
-                onChange={(e) => setTweet(e.target.value)}
+                value={post}
+                onChange={(e) => setPost(e.target.value)}
                 placeholder="What's happening?"
                 className={cn(
                   'w-full border-none focus-visible:ring-0 text-lg resize-none min-h-[80px] p-4 shadow-none',
@@ -231,7 +231,7 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
               </div>
 
               <div className="flex items-center gap-3">
-                {tweet.length > 0 && (
+                {post.length > 0 && (
                   <div className="relative flex items-center justify-center h-7 w-7">
                     <svg className="w-full h-full" viewBox="0 0 24 24">
                       <circle
@@ -260,7 +260,7 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
                         strokeWidth="2"
                         stroke="currentColor"
                         strokeDasharray={Math.PI * 20}
-                        strokeDashoffset={Math.PI * 20 * (1 - tweet.length / MAX_TWEET_LENGTH)}
+                        strokeDashoffset={Math.PI * 20 * (1 - post.length / MAX_POST_LENGTH)}
                         transform="rotate(-90 12 12)"
                       />
                     </svg>
@@ -285,7 +285,7 @@ export default function TweetInput({ user }: { user: SimpleUserInfo }) {
                   className="rounded-full px-4 h-9"
                   disabled={
                     isOverLimit ||
-                    (!tweet.trim() && images.length === 0) ||
+                    (!post.trim() && images.length === 0) ||
                     isSubmitting ||
                     images.some((img) => img.uploading)
                   }
