@@ -9,16 +9,16 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 
-import TweetFeed from '@/components/tweet-feed';
+import PostFeed from '@/components/post-feed';
 import { getPostsByUserId } from '@/posts';
 import { getFollowingCount, getFollowersCount } from '@/followers';
 import { clerkClient } from '@/db';
 import type { SimpleUserInfo } from '@/users';
-import type { TweetWithUser } from '@/interfaces';
+import type { PostWithUser } from '@/interfaces';
 
 interface ProfileData {
   user: SimpleUserInfo;
-  tweets: TweetWithUser[];
+  formattedPosts: PostWithUser[];
   followingCount: number;
   followersCount: number;
   isCurrentUser: boolean;
@@ -62,7 +62,7 @@ async function getProfileData(userId: string, currentUserId: string): Promise<Pr
     imageUrl: user.imageUrl,
   };
 
-  const tweets: TweetWithUser[] = posts.map((post) => ({
+  const formattedPosts: PostWithUser[] = posts.map((post) => ({
     post,
     user: {
       id: userInfo.id,
@@ -75,7 +75,7 @@ async function getProfileData(userId: string, currentUserId: string): Promise<Pr
 
   return {
     user: userInfo,
-    tweets,
+    formattedPosts,
     followingCount,
     followersCount,
     isCurrentUser: currentUserId === userId,
@@ -83,7 +83,7 @@ async function getProfileData(userId: string, currentUserId: string): Promise<Pr
 }
 
 function ProfileContent({ data }: { data: ProfileData; }) {
-  const { user, tweets, followingCount, followersCount, isCurrentUser } = data;
+  const { user, formattedPosts, followingCount, followersCount, isCurrentUser } = data;
 
   return (
     <div className="flex md:grid md:grid-cols-[1fr] lg:grid-cols-[1fr_3fr_1fr] lg:gap-5 w-full">
@@ -137,8 +137,8 @@ function ProfileContent({ data }: { data: ProfileData; }) {
           {/* Tabs for different content types */}
           <Tabs defaultValue="posts">
             <TabsContent value="posts">
-              {tweets.length > 0 ? (
-                <TweetFeed tweets={tweets} loggedUser={user} />
+              {formattedPosts.length > 0 ? (
+                <PostFeed posts={formattedPosts} loggedUser={user} />
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <h3 className="text-lg font-medium">No posts yet</h3>

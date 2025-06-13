@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import TweetInput from '@/components/tweet-input';
-import TweetFeed from '@/components/tweet-feed';
+import PostInput from '@/components/post-input';
+import PostFeed from '@/components/post-feed';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { currentUser } from '@clerk/nextjs/server';
@@ -42,16 +42,16 @@ export default async function Home() {
               </CardHeader>
             </Card>
 
-            <TweetInput user={user} />
+            <PostInput user={user} />
 
             <TabsContent value="for-you">
-              <Suspense fallback={<TweetFeedSkeleton />}>
+              <Suspense fallback={<PostFeedSkeleton />}>
                 <FeaturedFeed loggedUser={user} />
               </Suspense>
             </TabsContent>
 
             <TabsContent value="following">
-              <Suspense fallback={<TweetFeedSkeleton />}>
+              <Suspense fallback={<PostFeedSkeleton />}>
                 <FollowingFeed loggedUser={user} />
               </Suspense>
             </TabsContent>
@@ -69,13 +69,13 @@ export default async function Home() {
 }
 
 async function FeaturedFeed({ loggedUser }: { loggedUser: SimpleUserInfo; }) {
-  const tweets = await getTopPosts();
-  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
+  const posts = await getTopPosts();
+  return <PostFeed posts={posts} loggedUser={loggedUser} />;
 }
 
 async function FollowingFeed({ loggedUser }: { loggedUser: SimpleUserInfo; }) {
-  const tweets = await getPostsByFollowing({ userId: loggedUser.id });
-  return <TweetFeed tweets={tweets} loggedUser={loggedUser} />;
+  const posts = await getPostsByFollowing({ userId: loggedUser.id });
+  return <PostFeed posts={posts} loggedUser={loggedUser} />;
 }
 function WhoToFollowSkeleton() {
   return (
@@ -105,7 +105,7 @@ function WhoToFollowSkeleton() {
   );
 }
 
-function TweetFeedSkeleton() {
+function PostFeedSkeleton() {
   return (
     <div className="space-y-6">
       {Array(5)
