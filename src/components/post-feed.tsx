@@ -1,18 +1,18 @@
-import Tweet from '@/components/tweet';
-import { TweetWithUser } from '@/interfaces';
+import Post from '@/components/post';
+import { PostWithUser } from '@/interfaces';
 import { SimpleUserInfo } from '@/users';
 
-export default function TweetFeed({
-  tweets,
+export default function PostFeed({
+  posts,
   loggedUser,
 }: {
-  tweets: TweetWithUser[];
+  posts: PostWithUser[];
   loggedUser: SimpleUserInfo;
 }) {
   return (
     <div className="space-y-6 w-full ">
-      {tweets.map((tweet) => (
-        <Tweet key={tweet.post.id} tweet={tweet} loggedUser={loggedUser} />
+      {posts.map((post) => (
+        <Post key={post.post.id} post={post} loggedUser={loggedUser} />
       ))}
     </div>
   );
