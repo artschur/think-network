@@ -10,7 +10,7 @@ export interface UploadImageTemporary {
   storagePath: string;
 }
 
-export interface TweetWithUser {
+export interface PostWithUser {
   post: {
   id: number;
   content: string;
