@@ -6,7 +6,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import type { SimpleUserInfo } from '@/users';
 import WhoToFollowWrapper from '@/components/who-to-follow-wrapper';
 import { getTrendingPosts } from '@/posts';
-import TweetFeed from '@/components/tweet-feed';
+import PostFeed from '@/components/post-feed';
 
 export default async function TrendingPage() {
   const response = await currentUser();
@@ -60,7 +60,7 @@ async function TrendingContent({ user }: { user: SimpleUserInfo }) {
       </Card>
     );
   }
-  return <TweetFeed tweets={trendingPosts} loggedUser={user} />;
+  return <PostFeed posts={trendingPosts} loggedUser={user} />;
 }
 
 
