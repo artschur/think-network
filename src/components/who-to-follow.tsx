@@ -56,7 +56,6 @@ export default function WhoToFollow({
         </div>
       </CardHeader>
 
-      {/* Conteúdo com scroll interno e altura máxima */}
       <div className="max-h-[50vh] overflow-y-auto">
         <CardContent className="p-0 divide-y divide-border/50">
           {visibleUsers.map((recommendedUser) => (
