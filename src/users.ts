@@ -3,7 +3,7 @@
 import { db } from './db';
 import { followersTable, PostSelect } from './db/schema';
 import { clerkClient } from './db';
-import { eq, not, inArray, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 export interface SimpleUserInfo {
   id: string;
@@ -19,44 +19,32 @@ export async function getRecommendedUsers({
   userId: string;
   limit: number;
 }): Promise<SimpleUserInfo[]> {
-  
+  // IDs que o usuário já segue
   const following = await db
     .select({ id: followersTable.followingId })
     .from(followersTable)
     .where(eq(followersTable.userId, userId));
-
   const followingIds = following.map((f) => f.id);
 
-  const nonFollowedUsers = await db
-    .select({ id: followersTable.userId })
-    .from(followersTable)
-    .where(
-      and(
-        not(eq(followersTable.userId, userId)),
-        not(inArray(followersTable.userId, followingIds)),
-      )
-    )
-    .groupBy(followersTable.userId)
-    .limit(limit);
+  // Buscar todos os usuários na Clerk
+  const allUsers = await clerkClient.users.getUserList({ limit: 100 }); // Pode ajustar esse limite
+  const filtered = allUsers.data.filter(
+    (u) => u.id !== userId && !followingIds.includes(u.id)
+  );
 
-  let recommendedIds = nonFollowedUsers.map((u) => u.id);
+  // Recomendação inicial: usuários que o usuário não segue
+  let recommended = filtered.slice(0, limit);
 
-  if (recommendedIds.length < limit) {
-    const remaining = limit - recommendedIds.length;
-    const fallbackFollowing = followingIds
-      .filter((id) => id !== userId)
+  // Se não tiver o suficiente, completar com usuários que ele já segue
+  if (recommended.length < limit) {
+    const remaining = limit - recommended.length;
+    const fallback = allUsers.data
+      .filter((u) => followingIds.includes(u.id))
       .slice(0, remaining);
-    recommendedIds = [...recommendedIds, ...fallbackFollowing];
+    recommended = [...recommended, ...fallback];
   }
 
-  if (recommendedIds.length === 0) return [];
-
-  const usersInfo = await clerkClient.users.getUserList({
-    userId: recommendedIds,
-    limit,
-  });
-
-  return usersInfo.data.map((user) => ({
+  return recommended.map((user) => ({
     id: user.id,
     username: user.username,
     fullName: user.fullName,
