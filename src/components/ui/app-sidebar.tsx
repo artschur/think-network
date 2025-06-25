@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
-
-import { Heart, Home, TrendingUp } from 'lucide-react';
+import { Heart, Home, TrendingUp, User } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +12,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { UserButton } from '@clerk/nextjs';
-import { usePathname } from "next/navigation";
 
 // Menu items.
 const items = [
@@ -28,19 +26,18 @@ const items = [
     icon: Heart,
   },
   {
-    title: "Trending",
-    url: "/trending",
+    title: 'Trending',
+    url: '/trending',
     icon: TrendingUp,
+  },
+  {
+    title: 'Profile',
+    url: '/profile',
+    icon: User,
   },
 ];
 
-export function AppSidebar() {
-
-  const path = usePathname();
-  if (path === "/") {
-    return null; // Don't render sidebar on the root path
-  }
-
+export async function AppSidebar() {
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarContent className="h-full flex flex-col justify-between py-4">
