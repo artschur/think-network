@@ -13,7 +13,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { UserButton } from '@clerk/nextjs';
-import { ModeToggle } from '../theme-toggle';
 import { usePathname } from "next/navigation";
 
 // Menu items.
@@ -60,10 +59,7 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
-                <div className="pr-8 pl-2 flex items-center justify-between">
-                  <UserButton />
-                  <ModeToggle />
-                </div>
+                <UserButton />
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

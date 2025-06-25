@@ -1,7 +1,7 @@
 import type React from 'react';
 import { Suspense } from 'react';
 import { currentUser } from '@clerk/nextjs/server';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,11 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 
 import TweetFeed from '@/components/tweet-feed';
 import { getPostsByUserId } from '@/posts';
-import { getFollowingCount, getFollowersCount } from '@/followers';
+import { getFollowingCount, getFollowersCount, checkIfFollowing } from '@/followers';
 import { clerkClient } from '@/db';
 import type { SimpleUserInfo } from '@/users';
 import type { TweetWithUser } from '@/interfaces';
+import { FollowButton } from '@/components/follow-button';
 
 interface ProfileData {
   user: SimpleUserInfo;
@@ -22,6 +23,8 @@ interface ProfileData {
   followingCount: number;
   followersCount: number;
   isCurrentUser: boolean;
+  currentUserId: string;
+  isFollowing: boolean;
 }
 
 async function getUserByUsername(username: string) {
@@ -73,17 +76,24 @@ async function getProfileData(userId: string, currentUserId: string): Promise<Pr
     images: [], // Add images if needed
   }));
 
+  const isFollowing = await checkIfFollowing({
+    userId: currentUserId,
+    followingId: userId,
+  }).catch(() => false)
+
   return {
     user: userInfo,
     tweets,
     followingCount,
     followersCount,
     isCurrentUser: currentUserId === userId,
+    currentUserId,
+    isFollowing,
   };
 }
 
 function ProfileContent({ data }: { data: ProfileData; }) {
-  const { user, tweets, followingCount, followersCount, isCurrentUser } = data;
+  const { user, tweets, followingCount, followersCount, isCurrentUser, currentUserId, isFollowing} = data;
 
   return (
     <div className="flex md:grid md:grid-cols-[1fr] lg:grid-cols-[1fr_3fr_1fr] lg:gap-5 w-full">
@@ -109,7 +119,11 @@ function ProfileContent({ data }: { data: ProfileData; }) {
                       Edit profile
                     </Button>
                   ) : (
-                    <Button className="rounded-full">Follow</Button>
+                    <FollowButton
+                      userId={currentUserId}
+                      followingId={user.id}
+                      initiallyFollowing={isFollowing}
+                    />
                   )}
                 </div>
 
@@ -255,6 +269,11 @@ async function ProfileDataWrapper({
   userId: string;
   currentUserId: string;
 }) {
-  const data = await getProfileData(userId, currentUserId);
-  return <ProfileContent data={data} />;
+
+  if (!currentUserId || !userId) {
+    redirect('/');
+  }
+
+  const data = await getProfileData(userId, currentUserId); 
+  return <ProfileContent data={data} />; 
 }
