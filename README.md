@@ -2,6 +2,16 @@
 
 A proposta do nosso projeto é oferecer uma experiência de rede social simples, mas com recursos que promovem interações significativas e a construção de uma comunidade. O acesso só é permitido a usuários autenticados, garantindo um ambiente seguro e controlado para os nossos usuários.
 
+## Links
+
+#### Repositório no GiHub
+
+👉 [https://github.com/artschur/think-network](https://github.com/artschur/think-network)
+
+#### Site em produção
+
+👉 [https://think-network.vercel.app/](https://think-network.vercel.app/)
+
 ## Principais Funcionalidades:
 
  • Autenticação Segura: Apenas usuários autenticados poderão acessar a plataforma, garantindo um espaço privado e protegido para interação.
@@ -16,11 +26,11 @@ A proposta do nosso projeto é oferecer uma experiência de rede social simples,
 
 ## Participantes
 
-- Arthur Schurhaus
-- Estéfano Tuyama Gerassi
-- Gean Pereira
-- Rafael Vieira Ferreira
-- Tom Sales Soares de Camargo
+- Arthur Schurhaus (24105043)
+- Estéfano Tuyama Gerassi (24100898)
+- Gean Pereira (24100906)
+- Rafael Vieira Ferreira (24102986)
+- Tom Sales Soares de Camargo (24100911)
 
 
 
