@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { UserButton } from '@clerk/nextjs';
+import { usePathname } from 'next/navigation';
 
 // Menu items.
 const items = [
@@ -37,7 +38,7 @@ const items = [
   },
 ];
 
-export async function AppSidebar() {
+export function AppSidebar() {
   const path = usePathname();
   if (path === '/') {
     return null; // Don't render sidebar on the root path
