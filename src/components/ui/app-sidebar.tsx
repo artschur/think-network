@@ -38,6 +38,11 @@ const items = [
 ];
 
 export async function AppSidebar() {
+  const path = usePathname();
+  if (path === '/') {
+    return null; // Don't render sidebar on the root path
+  }
+
   return (
     <Sidebar collapsible="icon" variant="floating">
       <SidebarContent className="h-full flex flex-col justify-between py-4">
