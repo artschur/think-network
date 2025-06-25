@@ -13,7 +13,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { UserButton } from '@clerk/nextjs';
-import { ModeToggle } from '../theme-toggle';
 import { usePathname } from "next/navigation";
 
 // Menu items.
