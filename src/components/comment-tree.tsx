@@ -73,7 +73,7 @@ export default function CommentTree({ comment, loggedUser, isTopLevel = false }:
   }
 
   const handleShare = async () => {
-    const commentUrl = `http://localhost:3000/post/${post.id}`
+    const commentUrl = `https://think-network.vercel.app/post/${post.id}`
 
     try {
       await navigator.clipboard.writeText(commentUrl)
